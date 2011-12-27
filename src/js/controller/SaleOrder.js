@@ -411,6 +411,10 @@ Ext.regController('SaleOrder', {
 				listeners: {
 					hide: function() {
 						this.iel.removeCls('editing');
+					},
+					cardswitch: function(panel, newC, oldC) {
+
+						localStorage.setItem('productInfoTab', newC.itemId);
 					}
 				}
 			});
@@ -464,6 +468,7 @@ Ext.regController('SaleOrder', {
 										});
 
 										this.pricePanel.showBy(iel, false, false);
+										this.pricePanel.setActiveItem(localStorage.getItem('productInfoTab'));
 
 										this.pricePanel.getComponent('shipmentList').refresh();
 									}
