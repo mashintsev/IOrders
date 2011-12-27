@@ -196,11 +196,13 @@ var getItemTplMeta = function(modelName, config) {
 						break;
 					}
 				}
-				
+
+				var isTitle = col.get('title');
+
 				templateData.otherColumns.push({
 					parent: col.get('parent') ? true : false,
 					label: label,
-					cls: colName === 'processing' ? colName + ' is-{' + colName + '}' : colName,
+					cls: colName === 'processing' ? colName + ' is-{' + colName + '}' : colName + (isTitle ? ' title' : ''),
 					name: name,
 					name_br: colName[0].toUpperCase() + colName.substring(1) + '_name'
 				});
