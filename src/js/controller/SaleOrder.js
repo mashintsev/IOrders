@@ -707,7 +707,7 @@ Ext.regController('SaleOrder', {
 			view.bonusProductStore.filterBy(function(rec, id) {
 				return tapedBonus.get('id') == rec.get('bonusprogram');
 			});
-	
+
 			view.productStore.bonusFilter = view.productStore.bonusFilter || new Ext.util.Filter({
 				filterFn: function(item) {
 					return view.bonusProductStore.findExact('product', item.get('product')) != -1;
@@ -721,7 +721,7 @@ Ext.regController('SaleOrder', {
 			view.bonusProductStore.clearFilter(true);
 
 			if(view.productStore.getCount() > 0) {
-	
+
 				view.offerCategoryStore.remoteFilter = false;
 				view.offerCategoryStore.clearFilter();
 				view.offerCategoryStore.filter(new Ext.util.Filter({
