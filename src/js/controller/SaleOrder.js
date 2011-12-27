@@ -136,8 +136,9 @@ Ext.regController('SaleOrder', {
 						newCard.productStore = createStore('Offer', {
 							remoteFilter: true,
 							remoteSort: true,
+							groupField: 'firstName',
 							getGroupString: function(rec) {
-								return rec.get('firstName');
+								return rec.get(this.groupField);
 							},
 							sorters: [{property: 'firstName', direction: 'ASC'}, {property: 'name', direction: 'ASC'}],
 							filters: [{property: 'customer', value: options.saleOrder.get('customer')}],
@@ -686,6 +687,34 @@ Ext.regController('SaleOrder', {
 		;
 
 		segBtn.setPressed(bonusBtn, true);
+	},
+
+	toggleGroupOn: function(options) {
+
+		var view = options.view,
+			segBtn = view.getDockedComponent('top').getComponent('ModeChanger'),
+			groupBtn = segBtn.getComponent('Group')
+		;
+
+		view.productStore.groupField = 'lastName';
+		view.productStore.sorters.removeAll();
+		view.productStore.remoteSort = false;
+		view.productStore.sort([{property: 'lastName', direction: 'ASC'}, {property: 'name', direction: 'ASC'}]);
+
+		segBtn.setPressed(groupBtn, false);
+		view.productList.refresh();
+	},
+
+	toggleGroupOff: function(options) {
+
+		var view = options.view;
+
+		view.productStore.groupField = 'firstName';
+		view.productStore.sorters.removeAll();
+		view.productStore.remoteSort = false;
+		view.productStore.sort([{property: 'firstName', direction: 'ASC'}, {property: 'name', direction: 'ASC'}]);
+
+		view.productList.refresh();
 	},
 
 	onAllBonusButtonTap: function(options) {
