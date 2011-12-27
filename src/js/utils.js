@@ -320,7 +320,14 @@ var createFieldSet = function(columnsStore, modelName, view) {
 						valueField: 'id',
 						displayField: 'name',
 						onFieldLabelTap: true,
-						onFieldInputTap: true
+						onFieldInputTap: true,
+						getListPanel: function() {
+							Ext.form.Select.prototype.getListPanel.apply(this, arguments);
+
+							this.setItemTplWithTitle();
+
+							return this.listPanel;
+						}
 					} : fieldConfig
 			);
 			fsItems.push(field);
