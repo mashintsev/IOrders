@@ -157,8 +157,10 @@ Ext.regController('SaleOrder', {
 
 								Ext.data.Store.prototype.filter.apply(this, arguments);
 
-								bonusProductStore.clearFilter(true);
-								bonusProgramStore.clearFilter(true);
+								if(filters.contains && filters.contains(this.isFocusedFilter) || filters == this.isFocusedFilter) {
+									bonusProductStore.clearFilter(true);
+									bonusProgramStore.clearFilter(true);
+								}
 							},
 							volumeFilter: new Ext.util.Filter({
 								filterFn: function(item) {
