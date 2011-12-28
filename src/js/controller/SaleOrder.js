@@ -84,12 +84,22 @@ Ext.regController('SaleOrder', {
 
 	onListItemTap: function(options) {
 		
-		var listEl = options.list.getEl();
+		var list = options.list,
+			listEl = list.getEl()
+		;
 		
 		if(listEl.hasCls('x-product-category-list')) {
 			
 			Ext.dispatch(Ext.apply(options, {action: 'onProductCategoryListItemTap'}));
 			
+		} else if (listEl.hasCls('x-product-list')) {
+
+			var target = Ext.get(options.event.target);
+
+			if(target.hasCls('crec')) {
+
+				Ext.dispatch({controller: 'SaleOrder', action: 'toggleBonusOn', view: list.up('saleorderview'), productRec: list.getRecord(options.item)});
+			}
 		} else if(listEl.hasCls('x-deps-list')) {
 			
 			var oldCard = IOrders.viewport.getActiveItem();
@@ -126,8 +136,9 @@ Ext.regController('SaleOrder', {
 						newCard.productStore = createStore('Offer', {
 							remoteFilter: true,
 							remoteSort: true,
+							groupField: 'firstName',
 							getGroupString: function(rec) {
-								return rec.get('firstName');
+								return rec.get(this.groupField);
 							},
 							sorters: [{property: 'firstName', direction: 'ASC'}, {property: 'name', direction: 'ASC'}],
 							filters: [{property: 'customer', value: options.saleOrder.get('customer')}],
@@ -146,8 +157,10 @@ Ext.regController('SaleOrder', {
 
 								Ext.data.Store.prototype.filter.apply(this, arguments);
 
-								bonusProductStore.clearFilter(true);
-								bonusProgramStore.clearFilter(true);
+								if(filters.contains && filters.contains(this.isFocusedFilter) || filters == this.isFocusedFilter) {
+									bonusProductStore.clearFilter(true);
+									bonusProgramStore.clearFilter(true);
+								}
 							},
 							volumeFilter: new Ext.util.Filter({
 								filterFn: function(item) {
@@ -401,6 +414,10 @@ Ext.regController('SaleOrder', {
 				listeners: {
 					hide: function() {
 						this.iel.removeCls('editing');
+					},
+					cardswitch: function(panel, newC, oldC) {
+
+						localStorage.setItem('productInfoTab', newC.itemId);
 					}
 				}
 			});
@@ -454,6 +471,7 @@ Ext.regController('SaleOrder', {
 										});
 
 										this.pricePanel.showBy(iel, false, false);
+										this.pricePanel.setActiveItem(localStorage.getItem('productInfoTab'));
 
 										this.pricePanel.getComponent('shipmentList').refresh();
 									}
@@ -602,7 +620,9 @@ Ext.regController('SaleOrder', {
 
 	toggleBonusOn: function(options) {
 
-		var view = options.view;
+		var view = options.view,
+			productRec = options.productRec
+		;
 
 		if(!view.bonusPanel) { 
 			view.bonusPanel = Ext.create({
@@ -635,15 +655,30 @@ Ext.regController('SaleOrder', {
 							segBtn.setPressed(btn, undefined, true);
 							changeBtnText(btn);
 						}
+
+						view.bonusProductStore.clearFilter(true);
+						view.bonusProgramStore.clearFilter(true);
 					}
 				}
 			});
 
 			view.cmpLinkArray.push(view.bonusPanel);
 		} else {
+			view.bonusPanel.getComponent('bonusList').refresh();
 			view.bonusPanel.getComponent('bonusList').scroller.scrollTo({y: 0});
 		}
+
 		view.bonusPanel.show();
+
+		if(productRec) {
+
+			view.bonusProductStore.filter({property: 'product', value: productRec.get('product')});
+
+			view.bonusProgramStore.filterBy(function(item) {return view.bonusProductStore.findExact('bonusprogram', item.getId()) !== -1;});
+
+			var bonusList = view.bonusPanel.getComponent('bonusList');
+			bonusList.selectSnapshot && bonusList.selModel.select(bonusList.selectSnapshot);
+		}
 	},
 
 	toggleBonusOff: function(options) {
@@ -654,6 +689,34 @@ Ext.regController('SaleOrder', {
 		;
 
 		segBtn.setPressed(bonusBtn, true);
+	},
+
+	toggleGroupOn: function(options) {
+
+		var view = options.view,
+			segBtn = view.getDockedComponent('top').getComponent('ModeChanger'),
+			groupBtn = segBtn.getComponent('Group')
+		;
+
+		view.productStore.groupField = 'lastName';
+		view.productStore.sorters.removeAll();
+		view.productStore.remoteSort = false;
+		view.productStore.sort([{property: 'lastName', direction: 'ASC'}, {property: 'name', direction: 'ASC'}]);
+
+		segBtn.setPressed(groupBtn, false);
+		view.productList.refresh();
+	},
+
+	toggleGroupOff: function(options) {
+
+		var view = options.view;
+
+		view.productStore.groupField = 'firstName';
+		view.productStore.sorters.removeAll();
+		view.productStore.remoteSort = false;
+		view.productStore.sort([{property: 'firstName', direction: 'ASC'}, {property: 'name', direction: 'ASC'}]);
+
+		view.productList.refresh();
 	},
 
 	onAllBonusButtonTap: function(options) {
@@ -674,10 +737,13 @@ Ext.regController('SaleOrder', {
 		;
 
 		if(!selectedBonus || tapedBonus.getId() != selectedBonus.getId()) {
+
+			bonusList.selectSnapshot = tapedBonus;
+
 			view.bonusProductStore.filterBy(function(rec, id) {
 				return tapedBonus.get('id') == rec.get('bonusprogram');
 			});
-	
+
 			view.productStore.bonusFilter = view.productStore.bonusFilter || new Ext.util.Filter({
 				filterFn: function(item) {
 					return view.bonusProductStore.findExact('product', item.get('product')) != -1;
@@ -691,7 +757,7 @@ Ext.regController('SaleOrder', {
 			view.bonusProductStore.clearFilter(true);
 
 			if(view.productStore.getCount() > 0) {
-	
+
 				view.offerCategoryStore.remoteFilter = false;
 				view.offerCategoryStore.clearFilter();
 				view.offerCategoryStore.filter(new Ext.util.Filter({
@@ -716,6 +782,8 @@ Ext.regController('SaleOrder', {
 
 			view.bonusMode && Ext.dispatch(Ext.apply(options, {action: 'afterFilterProductStore'}));
 			view.bonusMode = false;
+
+			bonusList.selectSnapshot = undefined;
 		}
 
 		view.productListIndexBar.loadIndex();

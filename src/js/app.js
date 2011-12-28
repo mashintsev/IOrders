@@ -1,4 +1,4 @@
-var DEBUG = location.protocol == 'https:' ? false : localStorage.getItem('DEBUG') === false ? false : true;
+var DEBUG = location.protocol == 'https:' ? false : localStorage.getItem('DEBUG') == 'true' ? true : false;
 var oldConsoLog = console.log;
 
 console.log = function() {
@@ -20,7 +20,7 @@ Ext.regApplication({
 	
 	init: function() {
 
-		IOrders.newDesign = localStorage.getItem('newDesign');
+		IOrders.newDesign = localStorage.getItem('newDesign') == 'true' ? true : false;
 
 		var store = Ext.getStore('tables');
 		
