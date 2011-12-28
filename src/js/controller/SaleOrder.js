@@ -703,19 +703,22 @@ Ext.regController('SaleOrder', {
 		view.productStore.remoteSort = false;
 		view.productStore.sort([{property: 'lastName', direction: 'ASC'}, {property: 'name', direction: 'ASC'}]);
 
-		segBtn.setPressed(groupBtn, false);
 		view.productList.refresh();
 	},
 
 	toggleGroupOff: function(options) {
 
-		var view = options.view;
+		var view = options.view,
+			segBtn = view.getDockedComponent('top').getComponent('ModeChanger'),
+			groupBtn = segBtn.getComponent('Group')
+		;
 
 		view.productStore.groupField = 'firstName';
 		view.productStore.sorters.removeAll();
 		view.productStore.remoteSort = false;
 		view.productStore.sort([{property: 'firstName', direction: 'ASC'}, {property: 'name', direction: 'ASC'}]);
 
+		segBtn.setPressed(groupBtn, false);
 		view.productList.refresh();
 	},
 
