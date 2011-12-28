@@ -24,8 +24,10 @@ var HorizontalIndexBar = Ext.extend(Ext.DataView, {
 		this.store.removeAll();
 		Ext.each(groups, function(group) {
 
-			this.store.add({key: group.name, value: group.name});
+			this.store.add({key: group.name.toLowerCase(), value: group.name});
 		}, this);
+
+		this.store.sort({property: 'key', value: 'ASC'});
 	},
 
 	initComponent : function() {

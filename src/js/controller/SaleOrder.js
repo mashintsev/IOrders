@@ -138,7 +138,7 @@ Ext.regController('SaleOrder', {
 							remoteSort: true,
 							groupField: 'firstName',
 							getGroupString: function(rec) {
-								return rec.get(this.groupField).replace(' ', '');
+								return rec.get(this.groupField).replace(/ /g, '_');
 							},
 							sorters: [{property: 'firstName', direction: 'ASC'}, {property: 'name', direction: 'ASC'}],
 							filters: [{property: 'customer', value: options.saleOrder.get('customer')}],
@@ -652,7 +652,7 @@ Ext.regController('SaleOrder', {
 							var segBtn = view.getDockedComponent('top').getComponent('ModeChanger'),
 								btn = segBtn.getComponent('Bonus')
 							;
-							segBtn.setPressed(btn, undefined, true);
+							segBtn.setPressed(btn, false, true);
 							changeBtnText(btn);
 						}
 

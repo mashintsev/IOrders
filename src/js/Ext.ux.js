@@ -190,6 +190,12 @@ Ext.override(Ext.List, {
             ln = groups.length,
             group, i, closest, id;
 
+        groups.sort(function(a, b) {
+        	var o1 = a.name.toLowerCase(),
+        		o2 = b.name.toLowerCase()
+        	;
+        	return o1 == o2 ? 0 : (o1 > o2 ? 1: -1);
+        });
         for (i = 0; i < ln; i++) {
             group = groups[i];
             id = this.getGroupId(group);
