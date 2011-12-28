@@ -704,6 +704,8 @@ Ext.regController('SaleOrder', {
 		view.productStore.sort([{property: 'lastName', direction: 'ASC'}, {property: 'name', direction: 'ASC'}]);
 
 		view.productList.refresh();
+
+		view.productListIndexBar.loadIndex();
 	},
 
 	toggleGroupOff: function(options) {
@@ -719,7 +721,10 @@ Ext.regController('SaleOrder', {
 		view.productStore.sort([{property: 'firstName', direction: 'ASC'}, {property: 'name', direction: 'ASC'}]);
 
 		segBtn.setPressed(groupBtn, false);
+
 		view.productList.refresh();
+
+		view.productListIndexBar.loadIndex();
 	},
 
 	onAllBonusButtonTap: function(options) {
