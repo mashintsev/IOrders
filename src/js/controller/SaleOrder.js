@@ -655,7 +655,6 @@ Ext.regController('SaleOrder', {
 							segBtn.setPressed(btn, false, true);
 							changeBtnText(btn);
 						}
-
 						view.bonusProductStore.clearFilter(true);
 						view.bonusProgramStore.clearFilter(true);
 					}
@@ -663,11 +662,11 @@ Ext.regController('SaleOrder', {
 			});
 
 			view.cmpLinkArray.push(view.bonusPanel);
-		} else {
-			view.bonusPanel.getComponent('bonusList').refresh();
-			view.bonusPanel.getComponent('bonusList').scroller.scrollTo({y: 0});
 		}
 
+		var list = view.bonusPanel.getComponent('bonusList');
+
+		list.refresh();
 		view.bonusPanel.show();
 
 		if(productRec) {
@@ -678,6 +677,8 @@ Ext.regController('SaleOrder', {
 
 			var bonusList = view.bonusPanel.getComponent('bonusList');
 			bonusList.selectSnapshot && bonusList.selModel.select(bonusList.selectSnapshot);
+
+			list.scroller.scrollTo({y: 0});
 		}
 	},
 
