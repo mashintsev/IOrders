@@ -40,6 +40,12 @@ var SaleOrderView = Ext.extend(AbstractView, {
 			id: 'bottomToolbar', xtype: 'toolbar', dock: 'bottom',
 			items: [
 				{xtype: 'spacer'},
+				{xtype: 'segmentedbutton', itemId: 'GroupChanger',
+					items: [
+						{name: 'GroupLastname', itemId: 'GroupLastname', text: 'По производителю', scope: this},
+						{name: 'GroupFirstname', itemId: 'GroupFirstname', text: 'По наименованию', scope: this, pressed: true}
+					]
+				},
 				{text: this.indexBarMode ? 'Скрыть индекс-бар' : 'Показать индекс-бар', altText: !this.indexBarMode ? 'Скрыть индекс-бар' : 'Показать индекс-бар', itemId: 'ShowIndexBar', name: 'ShowIndexBar', scope: this},
 				{text: summTpl.apply({totalCost: 0}), itemId: 'ShowCustomer', name: 'ShowCustomer', scope: this}
 			],
@@ -50,7 +56,6 @@ var SaleOrderView = Ext.extend(AbstractView, {
 			{xtype: 'spacer'},
 			{xtype: 'segmentedbutton', allowMultiple: true, itemId: 'ModeChanger',
 				items: [
-					{itemId: 'Group', text: 'По наименованию', altText: 'По производителю', handler: Ext.emptyFn},
 					{itemId: 'Active', text: 'Показать актив', altText: 'Скрыть актив', handler: Ext.emptyFn},
 					{itemId: 'Bonus', text: 'По акциям', handler: Ext.emptyFn, disallowOther: ['ShowSaleOrder']},
 					{itemId: 'ShowSaleOrder', text: 'Показать заказ', altText: 'Показать все', handler: Ext.emptyFn, disallowOther: ['Bonus']}

@@ -138,7 +138,7 @@ Ext.regController('SaleOrder', {
 							remoteSort: true,
 							groupField: 'firstName',
 							getGroupString: function(rec) {
-								return rec.get(this.groupField);
+								return rec.get(this.groupField).replace(' ', '');
 							},
 							sorters: [{property: 'firstName', direction: 'ASC'}, {property: 'name', direction: 'ASC'}],
 							filters: [{property: 'customer', value: options.saleOrder.get('customer')}],
@@ -691,7 +691,7 @@ Ext.regController('SaleOrder', {
 		segBtn.setPressed(bonusBtn, true);
 	},
 
-	toggleGroupOn: function(options) {
+	onGroupLastnameButtonTap: function(options) {
 
 		var view = options.view,
 			segBtn = view.getDockedComponent('top').getComponent('ModeChanger'),
@@ -708,7 +708,7 @@ Ext.regController('SaleOrder', {
 		view.productListIndexBar.loadIndex();
 	},
 
-	toggleGroupOff: function(options) {
+	onGroupFirstnameButtonTap: function(options) {
 
 		var view = options.view,
 			segBtn = view.getDockedComponent('top').getComponent('ModeChanger'),
@@ -719,8 +719,6 @@ Ext.regController('SaleOrder', {
 		view.productStore.sorters.removeAll();
 		view.productStore.remoteSort = false;
 		view.productStore.sort([{property: 'firstName', direction: 'ASC'}, {property: 'name', direction: 'ASC'}]);
-
-		segBtn.setPressed(groupBtn, false);
 
 		view.productList.refresh();
 
