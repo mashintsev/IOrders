@@ -209,6 +209,10 @@
 	background-color: #FFCCFF;
 }
 
+.needUpload .key{
+	background-color: #FFCCFF;
+}
+
 .negative, .isBlockedPlong, .isOverdue, .red, .caution{
 	color: red !important;
 }

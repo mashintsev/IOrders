@@ -116,7 +116,19 @@ Ext.regController('Navigator', {
 		
 		Ext.dispatch(Ext.apply(options, {action: 'setEditing', editing: false}));
 	},
+
+	controlButtonsVisibilities: function(view, hide) {
+
+		var topBar = view.getDockedComponent('top'),
+			delBtn = topBar.getComponent('Delete'),
+			editBtn = topBar.getComponent('SaveEdit')
+		;
 	
+		delBtn && delBtn[hide ? 'hide' : 'show']();
+	
+		editBtn && editBtn[hide ? 'hide' : 'show']();
+	},
+
 	setEditing: function(options) {
 		options.view.setFieldsDisabled(!options.editing);
 		options.view.editing = options.editing;

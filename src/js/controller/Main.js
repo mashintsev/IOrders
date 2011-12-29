@@ -31,7 +31,7 @@ Ext.regController('Main', {
 
 		options.btn.up('form').submit();
 	},
-	
+
 	onCacheRefreshButtonTap: function(options) {
 		var queue = function() {
 			Ext.Msg.alert('refresh end');

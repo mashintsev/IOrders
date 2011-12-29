@@ -93,7 +93,7 @@ var getItemTplMeta = function(modelName, config) {
 		otherColumnsLength: 0,
 		otherColumns: [],
 		buttons: useDeps && !onlyKey ? buttons : '',
-		cls: ''
+		cls: '<tpl if="needUpload">needUpload</tpl>'
 	};
 	
 	var idColExist = columnStore.findExact('name', 'id') === -1 ? false : true;
