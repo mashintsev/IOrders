@@ -210,7 +210,7 @@
 }
 
 .needUpload .key{
-	background-color: #FFCCFF;
+	color: blue;
 }
 
 .negative, .isBlockedPlong, .isOverdue, .red, .caution{
