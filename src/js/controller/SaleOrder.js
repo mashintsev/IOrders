@@ -757,7 +757,7 @@ Ext.regController('SaleOrder', {
 				}
 			});
 
-			view.productStore.filtersSnapshot = view.productStore.filters.items;
+			view.bonusMode || (view.productStore.filtersSnapshot = view.productStore.filters.items);
 			view.productStore.clearFilter(true);
 			view.productStore.filter(view.productStore.bonusFilter);
 
