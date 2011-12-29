@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<metadata xmlns="http://unact.net/xml/xi" name="iorders" version="1.721" expect-megabytes="15">
+<metadata xmlns="http://unact.net/xml/xi" name="iorders" version="1.722" expect-megabytes="15">
   <tables set-of="table">
     <table id="Uncashment" name="Сданная выручка" nameSet="Сданная выручка" level="0" extendable="true">
       <columns set-of="column">
@@ -284,6 +284,7 @@
         <column id="Offerprice" name="price" type="float" label="Цена"/>
         <column id="Offerproduct" name="product" label="Товар"/>
         <column id="OfferfirstName" name="firstName" type="string" label="Преднаименование"/>
+        <column id="OfferlastName" name="lastName" type="string" label="Производитель"/>
         <column id="Offername" name="name" type="string" label="Наименование"/>
         <column id="Offerrel" name="rel" type="int" label="Шт. в упаковке"/>
         <column id="Offerfactor" name="factor" type="int" label="Кратность"/>
@@ -292,7 +293,6 @@
         <column id="OfferstockLevel" name="stockLevel" type="int" label="Уровень запаса"/>
         <column id="Offercost" name="cost" type="float" label="Стоимость"/>
         <column id="OfferlastActive" name="lastActive" type="int"/>
-        <column id="OfferlastName" name="lastName" type="string" label="Производитель"/>
       </columns>
       <sql>select c.id as customer, g.category, p.price, g.id as Product, g.firstName, g.lastName, g.name, g.rel, g.factor, g.extraLabel, (select group_concat(bp.tag) from BonusProgramProduct bpp join BonusProgram bp on bp.id = bpp.bonusProgram where product = g.id) as BonusProgram_tag, s.stockLevel, null as cost, round(julianday() - (select julianday(replace(max(s.date), '/', '-')) from Shipment s join ShipmentPosition sp on sp.shipment = s.id where sp.product = g.id and s.customer = c.id ),0) as lastActive from Customer c join PartnerPriceList ppl on ppl.partner = c.partner join Price p on p.pricelistSet = ppl.pricelistSet and p.priceList = ppl.priceList join Product g on g.id = p.product join Stock s on s.product = g.id and s.warehouse = c.warehouse and s.stockLevel &gt; 0</sql>
     </view>
