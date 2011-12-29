@@ -12,7 +12,9 @@ Ext.regController('Navigator', {
 	
 	onHomeButtonTap: function(options) {
 
-		IOrders.viewport.setActiveItem(new NavigatorView({
+		IOrders.viewport.setActiveItem(Ext.create({
+			xtype: 'navigatorview',
+			layout: 'fit',
 			isObjectView: true,
 			objectRecord: IOrders.mainMenuRecord
 		}), IOrders.viewport.anims.home);
