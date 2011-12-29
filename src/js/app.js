@@ -180,7 +180,8 @@ Ext.regApplication({
 			}
 			
 			this.dbeng.startDatabase(metadata);
-			
+
+			Ext.dispatch({controller: 'Navigator', action: 'afterAppLaunch'});
 		}
 	}
 });

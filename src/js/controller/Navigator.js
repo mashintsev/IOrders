@@ -1,5 +1,45 @@
 Ext.regController('Navigator', {
-	
+
+	afterAppLaunch: function(options) {
+
+		this.mon(IOrders.xi, 'uploadrecord', this.onUploadRecord, this);
+	},
+
+	onUploadRecord: function(record) {
+
+		var view = IOrders.viewport.getActiveItem();
+
+		if(view.isXType('navigatorview')) {
+
+			if(view.isObjectView) {
+
+				var objRec = view.objectRecord,
+					form = view.form
+				;
+
+				if(objRec.get('xid') == record.get('xid')) {
+/*
+					form.loadRecord(record);
+					view.objectRecord = record;
+
+					if(objRec.modelName === 'SaleOrder') {
+
+						var tBar = form.getDockedItem('statusToolbar');
+						tBar.getComponent('processing').setPressed();
+					}
+*/					
+					IOrders.viewport.setActiveItem(Ext.create(Ext.apply(getOwnerViewConfig(view).ownerViewConfig, {objectView: record})), IOrders.viewport.anims.home);
+					Ext.Msg.alert('', 'Страница обновлена');
+				}
+			} else if(view.isSetView) {
+
+				var store = view.setViewStore,
+					sameRecord = store.findRecord('xid', record.get('xid'))
+				;
+			}
+		}
+	},
+
 	onBackButtonTap: function(options) {
 		var view = options.view;
 		var newCard = Ext.create(view.ownerViewConfig);

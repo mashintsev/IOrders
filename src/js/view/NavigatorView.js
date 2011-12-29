@@ -97,10 +97,10 @@ var NavigatorView = Ext.extend(AbstractView, {
 					;
 					
 					statusButtons =  [
-						{text: 'Черновик', name: 'draft', enable: function(s) { return s == 'upload'; }},
-						{text: 'В работу', name: 'upload', enable: function(s) { return s == 'draft'; } },
-						{text: 'Проверка', name: 'processing'},
-						{text: 'На складе', name: 'done'}
+						{text: 'Черновик', itemId: 'draft', name: 'draft', enable: function(s) { return s == 'upload'; }},
+						{text: 'В работу', itemId: 'upload', name: 'upload', enable: function(s) { return s == 'draft'; } },
+						{text: 'Проверка', itemId: 'processing', name: 'processing'},
+						{text: 'На складе', itemId: 'done', name: 'done'}
 					];
 					
 					if (me.objectRecord) Ext.each (statusButtons, function(b) {
@@ -115,10 +115,12 @@ var NavigatorView = Ext.extend(AbstractView, {
 					
 					formItems.push({
 						xtype: 'toolbar',
+						itemId: 'statusToolbar',
 						dock: 'top',
 						ui: 'none',
 						items:[
 							{	xtype: 'segmentedbutton',
+								itemId: cName,
 								items: statusButtons,
 								name: cName, cls: 'statuses'
 							}
@@ -256,6 +258,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 
 			formItems.push(Ext.apply({
 				xtype: 'list',
+				itemId: 'list',
 				plugins: new Ext.plugins.ListPagingPlugin({autoPaging: true}),
 				scroll: false,
 				cls: 'x-table-list',
