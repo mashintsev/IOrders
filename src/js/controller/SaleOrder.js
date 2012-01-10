@@ -268,6 +268,8 @@ Ext.regController('SaleOrder', {
 																oldCard.setLoading(false);
 																IOrders.viewport.setActiveItem(newCard);
 																newCard.productListIndexBar.loadIndex();
+
+																Ext.dispatch(Ext.apply(options, {action: 'expandFocusedProduct', view: newCard}));
 															}
 														});
 													}
@@ -509,9 +511,22 @@ Ext.regController('SaleOrder', {
 		
 		if (view.modeActive)
 			Ext.dispatch (Ext.apply (options, {action: 'toggleActiveOn'}));
-		
+
+		Ext.dispatch(Ext.apply(options, {action: 'expandFocusedProduct'}));
+
 		view.setLoading(false);
-		
+	},
+
+	expandFocusedProduct: function(options) {
+		var view = options.view,
+			doms = view.productList.getEl().query('.x-list-item .focused')
+		;
+
+		Ext.each(doms, function(dom) {
+			var el = Ext.get(dom);
+
+			el.up('.x-list-item').addCls('active').up('.x-list-group-items').addCls('hasActive');
+		});
 	},
 
 	toggleActiveOn: function( options ) {
@@ -601,6 +616,8 @@ Ext.regController('SaleOrder', {
 		view.productList.el.toggleCls('expandable');
 
 		view.productListIndexBar.loadIndex();
+
+		Ext.dispatch(Ext.apply(options, {action: 'expandFocusedProduct'}));
 
 		view.setLoading(false);
 	},

@@ -253,7 +253,7 @@ function getItemTpl (modelName) {
 				+	'</div>';
 		}
 		case 'OfferProduct': {
-			return '<div class="hbox<tpl if="lastActive"> active</tpl>">'
+			return '<div class="hbox<tpl if="lastActive"> active</tpl><tpl if="BonusProgram_tag.search(\'Ф\') != -1"> focused</tpl>">'
 			       +'<div class="info {cls} data ' + '<tpl if="stockLevel==1">caution</tpl>' + '">'
 				     + '<p>{name}'
 						+'<tpl if="extraLabel"><span class="blue"> [{extraLabel}]</span></tpl>'
