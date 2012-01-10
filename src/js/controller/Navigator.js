@@ -2,7 +2,7 @@ Ext.regController('Navigator', {
 
 	afterAppLaunch: function(options) {
 
-		this.mon(IOrders.xi, 'uploadrecord', this.onUploadRecord, this);
+		this.mon(IOrders.xi, '', this.onUploadRecord, this);
 	},
 
 	onUploadRecord: function(record) {
@@ -17,7 +17,7 @@ Ext.regController('Navigator', {
 					form = view.form
 				;
 
-				if(objRec.get('xid') == record.get('xid')) {
+				if(objRec.get('xid') == record.get('row_id')) {
 /*
 					form.loadRecord(record);
 					view.objectRecord = record;
@@ -34,8 +34,13 @@ Ext.regController('Navigator', {
 			} else if(view.isSetView) {
 
 				var store = view.setViewStore,
-					sameRecord = store.findRecord('xid', record.get('xid'))
+					sameRecord = store.findRecord('xid', record.get('row_id'))
 				;
+
+				if(sameRecord) {
+
+					sameRecord.set(record.data);
+				}
 			}
 		}
 	},
