@@ -107,14 +107,14 @@ var EncashmentView = Ext.extend(AbstractView, {
 			},
 			scope: this
 		});
-		
+
 		this.customerSelect = Ext.create({
 			xtype: 'selectfield',
 			name: 'customer',
 			store: selectStore,
 			valueField: 'id', displayField: 'name'
 		});
-		
+
 		this.form = Ext.create({
 			xtype: 'form',
 			height: 100,
@@ -122,10 +122,13 @@ var EncashmentView = Ext.extend(AbstractView, {
 				this.customerSelect
 			]
 		});
-		
+
 		this.items = [this.form, this.debtList];
-		
-		this.dockedItems[0].items.push({name: 'SaveEncash', text: 'Сохранить', scope: this});
+
+		this.dockedItems[0].items.push(
+			{name: 'SaveEncash', text: 'Сохранить', scope: this},
+			{name: 'CreateEncashRequest', text: 'Создать заявку', scope: this}
+		);
 	}
 
 });

@@ -405,6 +405,18 @@ Ext.regController('Navigator', {
 		Ext.dispatch(Ext.apply(options, {action: 'goBack'}));
 	},
 
+	onCreateEncashRequestButtonTap: function(options) {
+
+		var view = options.view;
+
+		Ext.dispatch(Ext.apply(options, {
+			action: 'createAndActivateView',
+			editing: true,
+			record: Ext.ModelMgr.create({customer: view.customerSelect.getValue(), date: getNextWorkDay()}, 'EncashmentRequest'),
+			config: {ownerViewConfig: {xtype: 'encashmentview', partnerRecord: view.partnerRecord, customerRecord: view.objectRecord, ownerViewConfig: view.ownerViewConfig}}
+		}));
+	},
+
 	goBack: function(options) {
 
 		var view = options.view;
@@ -570,7 +582,7 @@ Ext.regController('Navigator', {
 	createAndActivateView: function(options) {
 		
 		var objectRecord = options.record || options.list.getRecord(options.item),
-		    config = {}
+		    config = options.config || {}
 		;
 		
 		options.tableRecord && Ext.apply(config, {

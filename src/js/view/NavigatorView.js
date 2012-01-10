@@ -108,7 +108,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 						
 						b.disabled = true;
 						
-						if (b.enable) b.disabled = !b.canEnable(state);
+						if (b.canEnable) b.disabled = !b.canEnable(state);
 						
 						if (b.pressed) b.disabled = false;
 					});

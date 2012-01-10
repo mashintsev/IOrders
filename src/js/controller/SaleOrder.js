@@ -468,7 +468,7 @@ Ext.regController('SaleOrder', {
 
 										shipmentStore.each(function(rec) {
 
-											var pos = shipPosStore.findRecord('shipment', rec.getId());
+											var pos = shipPosStore.findRecord('shipment', rec.getId(), undefined, undefined, true , true);
 											Ext.apply(rec.data, {name: productStore.getAt(0).get('name'), price: pos.get('price'), volume: pos.get('vol')});
 										});
 

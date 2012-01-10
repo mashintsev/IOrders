@@ -508,7 +508,7 @@ var createNavigatorView = function(rec, oldCard, isSetView, editing, config) {
 			editing: editing,
 			extendable: rec.get('extendable'),
 			ownerViewConfig: {
-				xtype: 'navigatorview',
+				xtype: oldCard.xtype || 'navigatorview',
 				layout: IOrders.newDesign ? {type: 'hbox', pack: 'justify', align: 'stretch'} : 'fit',
 				extendable: oldCard.extendable,
 				isObjectView: oldCard.isObjectView,
@@ -519,7 +519,7 @@ var createNavigatorView = function(rec, oldCard, isSetView, editing, config) {
 				storeLimit: oldCard.isSetView ? oldCard.setViewStore.currentPage * oldCard.setViewStore.pageSize : undefined,
 				storePage: oldCard.isSetView && oldCard.setViewStore.currentPage,
 				lastSelectedRecord: oldCard.lastSelectedRecord,
-				scrollOffset: oldCard.form.scroller.getOffset()
+				scrollOffset: oldCard.form.scroller && oldCard.form.scroller.getOffset()
 			}
 		}, config);
 		
