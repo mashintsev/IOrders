@@ -45,7 +45,7 @@ Ext.regController('SaleOrder', {
 		//offerStore.clearFilter(true);
 		
 		Ext.each(offerStore.getUpdatedRecords(), function(rec) {
-			var posRec = saleOrderPosStore.getAt(saleOrderPosStore.findExact('product', rec.get('product')));
+			var posRec = saleOrderPosStore.findRecord('product', rec.get('product'), undefined, undefined, true, true);
 			
 			if (!posRec) {
 				saleOrderPosStore.add (Ext.ModelMgr.create(Ext.apply({
