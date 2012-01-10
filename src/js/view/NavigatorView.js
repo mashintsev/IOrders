@@ -97,8 +97,8 @@ var NavigatorView = Ext.extend(AbstractView, {
 					;
 					
 					statusButtons =  [
-						{text: 'Черновик', itemId: 'draft', name: 'draft', enable: function(s) { return s == 'upload'; }},
-						{text: 'В работу', itemId: 'upload', name: 'upload', enable: function(s) { return s == 'draft'; } },
+						{text: 'Черновик', itemId: 'draft', name: 'draft', canEnable: function(s) { return s == 'upload'; }},
+						{text: 'В работу', itemId: 'upload', name: 'upload', canEnable: function(s) { return s == 'draft'; } },
 						{text: 'Проверка', itemId: 'processing', name: 'processing'},
 						{text: 'На складе', itemId: 'done', name: 'done'}
 					];
@@ -108,7 +108,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 						
 						b.disabled = true;
 						
-						if (b.enable) b.disabled = !b.enable(state);
+						if (b.enable) b.disabled = !b.canEnable(state);
 						
 						if (b.pressed) b.disabled = false;
 					});

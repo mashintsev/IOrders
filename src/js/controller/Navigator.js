@@ -18,18 +18,31 @@ Ext.regController('Navigator', {
 				;
 
 				if(objRec.get('xid') == record.get('id')) {
-/*
-					form.loadRecord(record);
-					view.objectRecord = record;
 
-					if(objRec.modelName === 'SaleOrder') {
+					Ext.ModelMgr.getModel(objRec.modelName).load(objRec.getId(), {
+						success: function(rec) {
+							form.loadRecord(rec);
 
-						var tBar = form.getDockedItem('statusToolbar');
-						tBar.getComponent('processing').setPressed();
-					}
-*/					
-					IOrders.viewport.setActiveItem(Ext.create(Ext.apply(getOwnerViewConfig(view).ownerViewConfig, {objectView: record})), IOrders.viewport.anims.home);
-					Ext.Msg.alert('', 'Страница обновлена');
+							var statusBar = form.getComponent('statusToolbar');
+
+							if(statusBar) {
+								var segBtn = statusBar.getComponent('processing'),
+									state = rec.get('processing');
+								;
+
+								segBtn.items.each(function(b) {
+									b.setPressed(b.name == state);
+
+									b.disable();
+									b.canEnable && b[b.canEnable(state) ? 'enable' : 'disable']();
+									b.pressed && b.enable();
+								});
+							}
+						}
+					});
+
+					var tableStore = Ext.getStore('tables');
+					view.depStore.loadData(getDepsData(tableStore.getById(view.objectRecord.modelName).deps(), tableStore, view));
 				}
 			} else if(view.isSetView) {
 
