@@ -1,12 +1,14 @@
 Ext.regController('SaleOrder', {
-	
+
 	onBackButtonTap: function(options) {
 		var s = options.view.productStore,
 			back = function () {
 				IOrders.viewport.setActiveItem(Ext.create(options.view.ownerViewConfig), IOrders.viewport.anims.back);
 			}
 		;
-		
+
+		options.view.ownerViewConfig.editing = true;
+
 		if (s && (s.snapshot && s.snapshot.filterBy(s.filterDirty).items.length || options.view.saleOrder.dirty)) Ext.Msg.confirm (
 			'Внимание, вопрос',
 			'Действительно нужно вернуться назад? Если да, то несохраненные данные будут потеряны',
@@ -17,25 +19,25 @@ Ext.regController('SaleOrder', {
 			}
 		); else back();
 	},
-	
+
 	onShowCustomerButtonTap: function(options) {
-		
+
 		var customer = options.view.customerRecord;
 
 		Ext.Msg.alert('', 'Клиент: ' + customer.get('name').replace(/"/g, '') + '<br/>' +'Адрес: ' + customer.get('address'));
 	},
-	
+
 	onSaveButtonTap: function(options) {
 		
 		Ext.dispatch(Ext.apply(options, {
 			action: 'saveOffer'
 		}));
-		
+
 		Ext.dispatch(Ext.apply(options, {
 			action: 'onBackButtonTap'
 		}));
 	},
-		
+
 	saveOffer: function(options) {
 		var view = options.view,
 		    offerStore = view.productStore,
