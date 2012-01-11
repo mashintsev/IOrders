@@ -13,7 +13,21 @@ var SaleOrderView = Ext.extend(AbstractView, {
 			filters:[{
 				property: 'customer',
 				value: this.saleOrder.get('customer')
-			}]
+			}],
+			initLastActive: function(productStore, productRecs) {
+
+				Ext.each(productRecs, function(product) {
+
+					var lastActive = product.get('lastActive');
+
+					if(lastActive) {
+
+						var category = this.getById(product.get('category'));
+
+						
+					}
+				}, this);
+			}
 		}, getGroupConfig('Category')));
 		
 		this.productCategoryList = Ext.create({
@@ -21,11 +35,7 @@ var SaleOrderView = Ext.extend(AbstractView, {
 			cls: 'x-product-category-list', allowDeselect: false, flex: 1,
 			scroll: false,
 			store: this.offerCategoryStore,
-			itemTpl: getItemTpl('OfferCategory'),
-			initLastActive: function(productStore) {
-
-				
-			}
+			itemTpl: getItemTpl('OfferCategory')
 		});
 		
 		this.productPanel = Ext.create({xtype: 'panel', layout: {type: 'vbox', pack: 'justify', align: 'stretch'}, flex: 3});

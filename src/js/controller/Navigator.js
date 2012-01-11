@@ -19,22 +19,24 @@ Ext.regController('Navigator', {
 
 				if(objRec.get('xid') == record.get('xid')) {
 
-					form.loadRecord(rec);
+					form.loadRecord(record);
 
 					var statusBar = form.getComponent('statusToolbar');
 
 					if(statusBar) {
 						var segBtn = statusBar.getComponent('processing'),
-							state = rec.get('processing');
+							state = record.get('processing');
 						;
 
-						segBtn.items.each(function(b) {
-							b.setPressed(b.name == state);
+						segBtn.getComponent(state).enable();
+						segBtn.setPressed(state, true, true);
 
+						segBtn.items.each(function(b) {
 							b.disable();
 							b.canEnable && b[b.canEnable(state) ? 'enable' : 'disable']();
 							b.pressed && b.enable();
 						});
+
 					}
 
 					var tableStore = Ext.getStore('tables');

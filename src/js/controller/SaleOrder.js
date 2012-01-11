@@ -174,6 +174,8 @@ Ext.regController('SaleOrder', {
 							})
 						});
 
+						newCard.productStore.on('load', newCard.offerCategoryStore.initLastActive, newCard.offerCategoryStore);
+
 						var saleOrderPositionStore = newCard.saleOrderPositionStore = createStore('SaleOrderPosition', {
 							remoteFilter: true,
 							filters: [{
@@ -191,8 +193,6 @@ Ext.regController('SaleOrder', {
 								
 								if (s) {
 
-									
-
 									newCard.productPanel.doLayout(); 	
 									newCard.productStore.remoteFilter = false;
 									
@@ -200,17 +200,17 @@ Ext.regController('SaleOrder', {
 										limit: 0,
 										callback: function(records, operation, s) {
 											if(s) {
-												
+
 												Ext.each(records, function(rec, idx, all) {
 													var offerRec = newCard.productStore.findRecord('product', rec.get('product'), undefined, undefined, true, true);
-													
+
 													if (offerRec) {
-														
+
 														offerRec.editing = true;
 														offerRec.set('volume', rec.get('volume'));
 														offerRec.set('cost', rec.get('cost'));
 														offerRec.commit(true);
-														
+
 													}
 													
 												});
