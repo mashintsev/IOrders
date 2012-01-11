@@ -303,3 +303,8 @@
 	font-size: 16px;
 	margin: 1px;
 }
+
+.x-product-selected .price, .x-product-selected .cost {
+	font-weight: bold;
+	color: black;
+}

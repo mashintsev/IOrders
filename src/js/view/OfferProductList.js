@@ -3,7 +3,7 @@ var offerProductList = {
 	xtype: 'expandableGroupedList',
 	cls: 'x-product-list',
 	itemTpl: getItemTpl('OfferProduct'),
-	disableSelection: true,
+	selectedItemCls: 'x-product-selected',
 	pinHeaders: false,
 
 	listeners: {
