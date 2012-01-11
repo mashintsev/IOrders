@@ -238,8 +238,10 @@ function getItemTpl (modelName) {
 				 + '</div>';
 		}
 		case 'OfferCategory': {
-			return '<div <tpl if="lastActive">class="active"</tpl> >{name}</div><div class="price">'
-				 //  + '<small> {totalCost} руб.</small>'
+			return '<div class="<tpl if="lastActive">active</tpl> <tpl if="minLastActive">active</tpl>">{name}</div>'
+				 + '<div>'
+				   + '<tpl if="minLastActive"><small class="minLastActive">{minLastActive}</small></tpl>'
+				   + '<tpl if="maxLastActive && maxLastActive != minLastActive"><small class="maxLastActive">{maxLastActive}</small></tpl>'
 				 + '</div>';
 		}
 		case 'ShipmentProduct': {
@@ -421,11 +423,11 @@ var getDepsData = function(depsStore, tablesStore, view) {
 				} else if (!depRec.get('extendable')) {
 					view.depStore.remove(operation.depRec);
 				}
-				
+
 			});
-			
+
 			var t = depTable;
-			
+
 			if(t && t.columns && t.columns().findBy(function(c){return c.get('name')=='processing'}) > 0) {
 				
 				filters.push({property: 'processing', value: 'draft'})

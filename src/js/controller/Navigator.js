@@ -20,6 +20,7 @@ Ext.regController('Navigator', {
 				if(objRec.get('xid') == record.get('xid')) {
 
 					form.loadRecord(record);
+					view.objectRecord = record;
 
 					var statusBar = form.getComponent('statusToolbar');
 
@@ -36,7 +37,6 @@ Ext.regController('Navigator', {
 							b.canEnable && b[b.canEnable(state) ? 'enable' : 'disable']();
 							b.pressed && b.enable();
 						});
-
 					}
 
 					var tableStore = Ext.getStore('tables');

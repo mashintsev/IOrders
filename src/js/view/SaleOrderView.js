@@ -22,9 +22,13 @@ var SaleOrderView = Ext.extend(AbstractView, {
 
 					if(lastActive) {
 
-						var category = this.getById(product.get('category'));
+						var category = this.findRecord('category', product.get('category'), undefined, undefined, true, true),
+							min = category.get('minLastActive'),
+							max = category.get('maxLastActive')
+						;
 
-						
+						if(!min || min < lastActive) category.set('minLastActive', lastActive);
+						if(!max || max < lastActive) category.set('maxLastActive', lastActive);
 					}
 				}, this);
 			}
@@ -39,7 +43,7 @@ var SaleOrderView = Ext.extend(AbstractView, {
 		});
 		
 		this.productPanel = Ext.create({xtype: 'panel', layout: {type: 'vbox', pack: 'justify', align: 'stretch'}, flex: 3});
-		
+
 		this.items = [this.productCategoryList, this.productPanel];
 		
 		var summTpl = new Ext.XTemplate(
