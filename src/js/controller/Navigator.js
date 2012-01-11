@@ -38,9 +38,6 @@ Ext.regController('Navigator', {
 							b.pressed && b.enable();
 						});
 					}
-
-					var tableStore = Ext.getStore('tables');
-					view.depStore.loadData(getDepsData(tableStore.getById(view.objectRecord.modelName).deps(), tableStore, view));
 				}
 			} else if(view.isSetView) {
 
