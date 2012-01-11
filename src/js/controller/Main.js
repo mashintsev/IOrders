@@ -19,8 +19,9 @@ Ext.regController('Main', {
 			}
 		}
 		;
-		
-		if (action) Ext.dispatch(Ext.apply(options, {
+
+		var controller = Ext.ControllerManager.get(redirectTo) || redirectTo;
+		if (action && controller && controller[action]) Ext.dispatch(Ext.apply(options, {
 			controller: redirectTo,
 			action: action
 		}));
