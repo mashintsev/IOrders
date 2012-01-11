@@ -238,10 +238,10 @@ function getItemTpl (modelName) {
 				 + '</div>';
 		}
 		case 'OfferCategory': {
-			return '<div class="<tpl if="lastActive">active</tpl> <tpl if="minLastActive">active</tpl>">{name}</div>'
+			return '<div class="<tpl if="lastActive || minLastActive">active</tpl>">{name}</div>'
 				 + '<div>'
-				   + '<tpl if="minLastActive"><small class="minLastActive">{minLastActive}</small></tpl>'
-				   + '<tpl if="maxLastActive && maxLastActive != minLastActive"><small class="maxLastActive">{maxLastActive}</small></tpl>'
+				   + '<tpl if="minLastActive"><small class="green">[{minLastActive}]</small></tpl>'
+				   + '<tpl if="maxLastActive && maxLastActive != minLastActive"><small class="green">[{maxLastActive}]</small></tpl>'
 				 + '</div>';
 		}
 		case 'ShipmentProduct': {

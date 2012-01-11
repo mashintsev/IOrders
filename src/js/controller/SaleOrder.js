@@ -532,29 +532,40 @@ Ext.regController('SaleOrder', {
 	},
 
 	toggleActiveOn: function( options ) {
-		var view = options.view,
-			doms = view.productList.getEl().query('.x-list-item .active')
-		;
+		var view = options.view;
 
 		view.modeActive = true;
-		Ext.each (doms, function(dom) {
+
+		var addActiveCls = function(dom) {
 			var el = Ext.get(dom);
 
 			el.up('.x-list-item').addCls('active').up('.x-list-group-items').addCls('hasActive');
-		});
+		}; 
+
+		//productList
+		Ext.each (view.productList.getEl().query('.x-list-item .active'), addActiveCls);
+
+		//categoryList
+		view.productCategoryList.setScrollable('vertical');
+		Ext.each(view.productCategoryList.getEl().query('.x-list-item .active'), addActiveCls);
 	},
 	
 	toggleActiveOff: function( options ) {
-		var view = options.view,
-			doms = view.productList.getEl().query('.x-list-group-items')
-		;
+		var view = options.view;
 
 		view.modeActive = false;
-		Ext.each (doms, function(dom) {
+
+		var removeActiveCls = function(dom) {
 			var el = Ext.get(dom);
 
 			el.removeCls('hasActive');
-		});
+		};
+
+		Ext.each(view.productList.getEl().query('.x-list-group-items'), removeActiveCls);
+
+		view.productCategoryList.scroller.scrollTo({y:0});
+		view.productCategoryList.setScrollable(false);
+		Ext.each(view.productCategoryList.getEl().query('.x-list-group-items'), removeActiveCls);
 	},
 
 	toggleShowSaleOrderOn: function(options) {
