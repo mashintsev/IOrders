@@ -17,29 +17,25 @@ Ext.regController('Navigator', {
 					form = view.form
 				;
 
-				if(objRec.get('xid') == record.get('id')) {
+				if(objRec.get('xid') == record.get('xid')) {
 
-					Ext.ModelMgr.getModel(objRec.modelName).load(objRec.getId(), {
-						success: function(rec) {
-							form.loadRecord(rec);
+					form.loadRecord(rec);
 
-							var statusBar = form.getComponent('statusToolbar');
+					var statusBar = form.getComponent('statusToolbar');
 
-							if(statusBar) {
-								var segBtn = statusBar.getComponent('processing'),
-									state = rec.get('processing');
-								;
+					if(statusBar) {
+						var segBtn = statusBar.getComponent('processing'),
+							state = rec.get('processing');
+						;
 
-								segBtn.items.each(function(b) {
-									b.setPressed(b.name == state);
+						segBtn.items.each(function(b) {
+							b.setPressed(b.name == state);
 
-									b.disable();
-									b.canEnable && b[b.canEnable(state) ? 'enable' : 'disable']();
-									b.pressed && b.enable();
-								});
-							}
-						}
-					});
+							b.disable();
+							b.canEnable && b[b.canEnable(state) ? 'enable' : 'disable']();
+							b.pressed && b.enable();
+						});
+					}
 
 					var tableStore = Ext.getStore('tables');
 					view.depStore.loadData(getDepsData(tableStore.getById(view.objectRecord.modelName).deps(), tableStore, view));
@@ -47,7 +43,7 @@ Ext.regController('Navigator', {
 			} else if(view.isSetView) {
 
 				var store = view.setViewStore,
-					sameRecord = store.findRecord('xid', record.get('id'), undefined, undefined, true, true)
+					sameRecord = store.findRecord('xid', record.get('xid'), undefined, undefined, true, true)
 				;
 
 				if(sameRecord) {

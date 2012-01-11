@@ -173,7 +173,7 @@ Ext.regController('SaleOrder', {
 								}
 							})
 						});
-						
+
 						var saleOrderPositionStore = newCard.saleOrderPositionStore = createStore('SaleOrderPosition', {
 							remoteFilter: true,
 							filters: [{
@@ -190,7 +190,9 @@ Ext.regController('SaleOrder', {
 							callback: function(r, o, s) {
 								
 								if (s) {
+
 									
+
 									newCard.productPanel.doLayout(); 	
 									newCard.productStore.remoteFilter = false;
 									

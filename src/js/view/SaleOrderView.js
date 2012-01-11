@@ -21,7 +21,11 @@ var SaleOrderView = Ext.extend(AbstractView, {
 			cls: 'x-product-category-list', allowDeselect: false, flex: 1,
 			scroll: false,
 			store: this.offerCategoryStore,
-			itemTpl: getItemTpl('OfferCategory')
+			itemTpl: getItemTpl('OfferCategory'),
+			initLastActive: function(productStore) {
+
+				
+			}
 		});
 		
 		this.productPanel = Ext.create({xtype: 'panel', layout: {type: 'vbox', pack: 'justify', align: 'stretch'}, flex: 3});
