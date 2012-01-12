@@ -634,6 +634,8 @@ Ext.regController('SaleOrder', {
 
 		Ext.dispatch(Ext.apply(options, {action: 'expandFocusedProduct'}));
 
+		view.modeActive && Ext.dispatch(Ext.apply(options, {action: 'toggleActiveOn'}));
+
 		view.setLoading(false);
 	},
 

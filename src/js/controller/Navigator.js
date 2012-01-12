@@ -62,7 +62,7 @@ Ext.regController('Navigator', {
 			IOrders.viewport.setActiveItem(newCard, IOrders.viewport.anims.back);
 		}
 	},
-	
+
 	onHomeButtonTap: function(options) {
 
 		IOrders.viewport.setActiveItem(Ext.create({
@@ -948,5 +948,36 @@ Ext.regController('Navigator', {
 				});
 			}
 		});
+	},
+
+	onNavigatorFieldValueChange: function(options) {
+
+		var field = options.field,
+			view = options.field.up('navigatorview')
+		;
+
+		if(view) {
+			if(view.objectRecord.modelName == 'SaleOrder') {
+
+				var saleOrder = view.objectRecord;
+
+				if(field.name == 'isBonus' && options.oldValue != undefined) {
+
+					var customerStore = view.form.items.getAt(1).getComponent('customer').store,
+						customerRecord = customerStore.getById(saleOrder.get('customer')),
+						tc = saleOrder.get('totalCost'),
+						bc = customerRecord.get('bonusCost')
+					;
+
+					customerRecord.set (
+						'bonusCost',
+						(options.newValue ? bc - tc : bc + tc).toFixed(2)
+					);
+					console.log(options.newValue);
+					customerRecord.save();
+					customerRecord.commit();
+				}
+			}
+		}
 	}
 });
