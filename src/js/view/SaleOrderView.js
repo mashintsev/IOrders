@@ -8,6 +8,8 @@ var SaleOrderView = Ext.extend(AbstractView, {
 	 */
 	createItems: function() {
 		
+		var metastore = Ext.getStore ('tables');
+		
 		this.offerCategoryStore = createStore('OfferCategory', Ext.apply({
 			remoteFilter: true,
 			filters:[{
@@ -15,18 +17,18 @@ var SaleOrderView = Ext.extend(AbstractView, {
 				value: this.saleOrder.get('customer')
 			}],
 			initLastActive: function(productStore, productRecs) {
-
+				
 				Ext.each(productRecs, function(product) {
-
+					
 					var lastActive = product.get('lastActive');
-
+					
 					if(lastActive) {
-
+						
 						var category = this.findRecord('category', product.get('category'), undefined, undefined, true, true),
 							min = category.get('minLastActive'),
 							max = category.get('maxLastActive')
 						;
-
+						
 						if(!min || min < lastActive) category.set('minLastActive', lastActive);
 						if(!max || max < lastActive) category.set('maxLastActive', lastActive);
 					}
@@ -56,22 +58,28 @@ var SaleOrderView = Ext.extend(AbstractView, {
 			+	'</p>'
 		);
 		
-		this.dockedItems.push({
+		var bb = {
 			id: 'bottomToolbar', xtype: 'toolbar', dock: 'bottom',
 			items: [
 				{xtype: 'spacer'},
 				{xtype: 'segmentedbutton', itemId: 'GroupChanger',
-					items: [
-						{name: 'GroupLastname', itemId: 'GroupLastname', text: 'По производителю', scope: this},
-						{name: 'GroupFirstname', itemId: 'GroupFirstname', text: 'По наименованию', scope: this, pressed: true}
-					]
+					items: [{
+							name: 'GroupLastname', itemId: 'GroupLastname', text: 'По производителю', scope: this
+						},{
+							name: 'GroupFirstname', itemId: 'GroupFirstname', text: 'По наименованию', scope: this, pressed: true
+					}]
 				},
 				{text: this.indexBarMode ? 'Скрыть индекс-бар' : 'Показать индекс-бар', altText: !this.indexBarMode ? 'Скрыть индекс-бар' : 'Показать индекс-бар', itemId: 'ShowIndexBar', name: 'ShowIndexBar', scope: this},
 				{text: summTpl.apply({totalCost: 0}), itemId: 'ShowCustomer', name: 'ShowCustomer', scope: this}
 			],
 			titleTpl: summTpl
-		});
-
+		}
+		
+		if (!metastore.getById('Product').columns().getById('ProductlastName'))
+			bb.items[1].disabled = true;
+		
+		this.dockedItems.push(bb);
+		
 		this.dockedItems[0].items.push(
 			{xtype: 'spacer'},
 			{xtype: 'segmentedbutton', allowMultiple: true, itemId: 'ModeChanger',

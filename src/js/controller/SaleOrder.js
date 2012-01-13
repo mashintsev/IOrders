@@ -1,23 +1,11 @@
 Ext.regController('SaleOrder', {
 
 	onBackButtonTap: function(options) {
-		var s = options.view.productStore,
-			back = function () {
-				IOrders.viewport.setActiveItem(Ext.create(options.view.ownerViewConfig), IOrders.viewport.anims.back);
-			}
-		;
-
-		options.view.ownerViewConfig.editing = true;
-
-		if (s && (s.snapshot && s.snapshot.filterBy(s.filterDirty).items.length || options.view.saleOrder.dirty)) Ext.Msg.confirm (
-			'Внимание, вопрос',
-			'Действительно нужно вернуться назад? Если да, то несохраненные данные будут потеряны',
-			function(b) {
-				if (b=='yes'){
-					back();
-				}
-			}
-		); else back();
+		
+		options.view.ownerViewConfig.editing = !(options.closeEditing || false) ;
+		
+		IOrders.viewport.setActiveItem(Ext.create(options.view.ownerViewConfig), IOrders.viewport.anims.back);
+		
 	},
 
 	onShowCustomerButtonTap: function(options) {
@@ -34,7 +22,8 @@ Ext.regController('SaleOrder', {
 		}));
 
 		Ext.dispatch(Ext.apply(options, {
-			action: 'onBackButtonTap'
+			action: 'onBackButtonTap',
+			closeEditing: true
 		}));
 	},
 
