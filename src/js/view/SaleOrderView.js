@@ -40,6 +40,7 @@ var SaleOrderView = Ext.extend(AbstractView, {
 			xtype: 'expandableGroupedList',
 			cls: 'x-product-category-list', allowDeselect: false, flex: 1,
 			scroll: true,
+			pinHeaders: false,
 			store: this.offerCategoryStore,
 			itemTpl: getItemTpl('OfferCategory')
 		});

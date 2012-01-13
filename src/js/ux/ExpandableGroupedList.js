@@ -20,27 +20,27 @@ var ExpandableGroupedList = Ext.extend(Ext.List, {
 	},
 	
 	onIndex: function(record, target, item) {
-
+		
 		var headerEl = ExpandableGroupedList.superclass.onIndex.apply(this, arguments).down('.x-list-header'),
 			groupEl = this.getGroupEl(headerEl)
 		;
-
+		
 		var headerElArray = this.getExpandedElHeaders();
 		headerElArray.removeByKey(headerEl.id);
 		this.setGroupExpanded(headerElArray, false);
-
+		
 		this.setGroupExpanded(groupEl, true, headerEl);
 	},
 
 	onListHeaderTap: function(e, t) {
-
+		
 		var tapedHeaderEl = Ext.get(t),
 			tapedGroupEl = this.getGroupEl(tapedHeaderEl),
 			expanded = tapedGroupEl.hasCls('expanded')
 		;
-
+		
 		this.setGroupExpanded(tapedGroupEl, !expanded, tapedHeaderEl);
-
+		
 		if(!expanded) {
 			var headerElArray = this.getExpandedElHeaders();
 			headerElArray.removeByKey(tapedHeaderEl.id);
@@ -49,29 +49,31 @@ var ExpandableGroupedList = Ext.extend(Ext.List, {
 	},
 
 	getExpandedElHeaders: function() {
-
+		
 		var expanded = new Ext.util.MixedCollection(),
 			headerElList = this.getEl().query('.x-list-header')
 		;
-
+		
 		Ext.each(headerElList, function(hEl) {
 			var hElem = Ext.get(hEl),
 				el = this.getGroupEl(hElem)
 			;
-			el && el.hasCls('expanded') && expanded.add(hElem);
+			el && el.hasCls('expanded') && !hElem.hasCls('x-list-header-swap') && expanded.add(hElem);
 		}, this);
-
+		
 		return expanded;
 	},
 
 	getGroupEl: function(headerEl) {
-
+		
 		var el = headerEl.next();
+		
 		if (headerEl.hasCls('x-list-header-swap')) {
 			return el.down('.x-group-' + headerEl.dom.innerText.toLowerCase() + ' .x-list-group-items');
 		} else {
 			return el;
 		}
+		
 	},
 
 	setGroupExpanded: function(el, expanded, headerEl) {
