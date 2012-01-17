@@ -251,7 +251,7 @@ function getItemTpl (modelName) {
 				+			'<div class="name">Товар: {name}</div>'
 				+			'<div class="price">Цена: {price}</div>'
 				+			'<div class="volume">Количество: {volume}</div>'
-				+		'<small>'
+				+		'</small>'
 				+	'</div>';
 		}
 		case 'OfferProduct': {
