@@ -394,52 +394,7 @@ var getDepsData = function(depsStore, tablesStore, view) {
 				editing: view.editing
 			}, 'Dep');
 			
-			var modelProxy = Ext.ModelMgr.getModel(depTable.get('id')).prototype.getProxy();
-			
-			var filters = [];
-			view.objectRecord.modelName != 'MainMenu' && filters.push({property: view.objectRecord.modelName.toLowerCase(), value: view.objectRecord.getId()});
-			
-			var aggCols = depTable.getAggregates();
-			var aggOperation = new Ext.data.Operation({depRec: depRec, filters: filters});
-			
-			modelProxy.aggregate(aggOperation, function(operation) {
-				
-				if (aggCols) {
-					var aggDepResult = '';
-					var aggDepTpl = new Ext.XTemplate('<tpl if="value &gt; 0"><tpl if="name">{name} : </tpl>{[values.value.toFixed(2)]} </tpl>');
-					var aggResults = operation.resultSet.records[0].data;
-					
-					aggCols.each(function(aggCol) {
-						aggDepResult += aggDepTpl.apply({name: aggCol.get('label') != depTable.get('nameSet') ? aggCol.get('label') : '', value: aggResults[aggCol.get('name')]});
-					});
-					
-					operation.depRec.set('aggregates', aggDepResult);
-				}
-				
-				var count = aggResults.cnt;
-				
-				if(count > 0) {
-					operation.depRec.set('count', count);
-				} else if (!depRec.get('extendable')) {
-					view.depStore.remove(operation.depRec);
-				}
-
-			});
-
-			var t = depTable;
-
-			if(t && t.columns && t.columns().findBy(function(c){return c.get('name')=='processing'}) > 0) {
-				
-				filters.push({property: 'processing', value: 'draft'})
-				
-				var countOperation = new Ext.data.Operation({depRec: depRec, filters: filters});
-				modelProxy.aggregate(countOperation, function(operation) {
-					
-					var aggResults = operation.resultSet.records[0].data;
-					if (aggResults.cnt > 0) operation.depRec.set('stats', aggResults.cnt);
-					
-				});
-			}
+			loadDepData(depRec, depTable, view);
 
 			data.push(depRec);
 		}
@@ -466,25 +421,54 @@ var prepareDepRecord = function() {
 	});
 };
 
-var loadDepData = function(depRec, depTable, filters, aggregatesHandler) {
+var loadDepData = function(depRec, depTable, view) {
 
 	var modelProxy = Ext.ModelMgr.getModel(depTable.get('id')).prototype.getProxy();
-		
+
+	var filters = [];
+
+	view.objectRecord.modelName != 'MainMenu' && filters.push({property: view.objectRecord.modelName.toLowerCase(), value: view.objectRecord.getId()});
+	
 	var aggCols = depTable.getAggregates();
 	var aggOperation = new Ext.data.Operation({depRec: depRec, filters: filters});
-
+	
 	modelProxy.aggregate(aggOperation, function(operation) {
-
-		var aggDepResult = '';
-		var aggDepTpl = new Ext.XTemplate('<tpl if="value &gt; 0"><tpl if="name">{name} : </tpl>{[values.value.toFixed(2)]} </tpl>');
-		var aggResults = operation.resultSet.records[0].data;
-
-		aggCols.each(function(aggCol) {
-			aggDepResult += aggDepTpl.apply({name: aggCol.get('label') != depTable.get('nameSet') ? aggCol.get('label') : '', value: aggResults[aggCol.get('name')]});
-		});
 		
-		aggregatesHandler.apply(this, [operation, aggResults, aggDepResult]);
+		if (aggCols) {
+			var aggDepResult = '';
+			var aggDepTpl = new Ext.XTemplate('<tpl if="value &gt; 0"><tpl if="name">{name} : </tpl>{[values.value.toFixed(2)]} </tpl>');
+			var aggResults = operation.resultSet.records[0].data;
+			
+			aggCols.each(function(aggCol) {
+				aggDepResult += aggDepTpl.apply({name: aggCol.get('label') != depTable.get('nameSet') ? aggCol.get('label') : '', value: aggResults[aggCol.get('name')]});
+			});
+			
+			operation.depRec.set('aggregates', aggDepResult);
+		}
+		
+		var count = aggResults.cnt;
+
+		operation.depRec.set('count', count);
+		if (count === 0 && !depRec.get('extendable')) {
+			view.depStore.remove(operation.depRec);
+		}
+
 	});
+
+	var t = depTable;
+
+	if(t && t.columns && t.columns().findBy(function(c){return c.get('name')=='processing';}) > 0) {
+		
+		filters.push({property: 'processing', value: 'draft'});
+		
+		var countOperation = new Ext.data.Operation({depRec: depRec, filters: filters});
+		modelProxy.aggregate(countOperation, function(operation) {
+			
+			var aggResults = operation.resultSet.records[0].data;
+			if (aggResults.cnt > 0) operation.depRec.set('stats', aggResults.cnt);
+			
+		});
+	}
 };
 
 var createTitlePanel = function(t) {

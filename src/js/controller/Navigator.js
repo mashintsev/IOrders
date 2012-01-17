@@ -3,6 +3,7 @@ Ext.regController('Navigator', {
 	afterAppLaunch: function(options) {
 
 		this.mon(IOrders.xi, 'uploadrecord', this.onUploadRecord, this);
+		this.mon(IOrders.xi, 'tableload', this.onUploadTable, this);
 	},
 
 	onUploadRecord: function(record) {
@@ -49,6 +50,40 @@ Ext.regController('Navigator', {
 
 					sameRecord.set(record.data);
 				}
+			}
+		}
+	},
+
+	onUploadTable: function(table) {
+
+		var view = IOrders.viewport.getActiveItem(),
+			tableStore = Ext.getStore('tables')
+		;
+
+		if(view.isObjectView) {
+
+			var depStore = view.depStore,
+				depRec = depStore.findRecord('table_id', table, undefined, undefined, true, true),
+				depTable = tableStore.getById(table),
+				objectTable = tableStore.getById(view.objectRecord.modelName)
+			;
+
+			if(depRec) {
+				loadDepData(depRec, depTable, view);
+			} else if(objectTable.deps().findExact('table_id', table) !== -1) {
+
+				var dep = objectTable.deps().findRecord('table_id', table, undefined, undefined, true, true);
+				depRec = Ext.ModelMgr.create({
+					name: depTable.get('nameSet'),
+					table_id: depTable.get('id'),
+					extendable: depTable.get('extendable'),
+					contains: dep.get('contains'),
+					editing: view.editing
+				}, 'Dep');
+
+				loadDepData(depRec, depTable, view);
+
+				depStore.add(depRec);
 			}
 		}
 	},
