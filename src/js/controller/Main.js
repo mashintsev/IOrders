@@ -364,6 +364,30 @@ Ext.regController('Main', {
 		localStorage.setItem('newDesign', false);
 	},
 
+	onApplyPatchButtonTap: function(options) {
+		
+		var me = IOrders.dbeng;
+		
+		me.db.transaction ( function(t) {
+			
+			t.debug = true;
+			
+			me.executeDDL (t, 'DROP view IF EXISTS ToUpload');
+			
+			me.executeDDL (t, 'create view ToUpload as select '
+				+ 'table_name, row_id id, count(*) cnt, min (ts) ts, max(wasPhantom) hasPhantom, max(p.id) pid, max(cs) cs'
+				+ ' from Phantom p where p.cs is null group by p.row_id, p.table_name'
+			);
+			
+			me.executeDDL (t, 'create trigger commitUpload instead of update on ToUpload begin '
+				+ 'delete from Phantom where row_id = new.id and id <= new.pid; '
+				+ 'end'
+			);
+			
+		}, function() { console.log ('Patch fail') }, function() { console.log ('Patch success') } )
+		
+	},
+
 	onListSelectionChange: function(options) {
 		
 		var navView = options.list.up('navigatorview');

@@ -835,6 +835,7 @@ Ext.regController('Navigator', {
 					{ text: 'Включить Heartbeat', name: 'HeartbeatOn'},
 					{ text: 'Запросить метаданные', name: 'XiMeta'},
 					{ text: 'Забыть пароль', name: 'ClearLocalStorage'},
+					{ text: 'Патч', name: 'ApplyPatch'},
 					{ text: 'Обновить кэш', name: 'CacheRefresh'},
 					{ text: 'Перезапустить', name: 'Reload'}
 				],
