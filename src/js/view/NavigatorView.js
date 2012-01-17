@@ -85,7 +85,10 @@ var NavigatorView = Ext.extend(AbstractView, {
 		
 		
 		this.dockedItems[0].items.push (this.syncButton);
-		
+
+		this.fbBtn = Ext.create({xtype: 'button', name: 'FacebookFeed', text: 'Новости', scope: this});
+		this.dockedItems[0].items.push(this.fbBtn);
+
 		if(this.isObjectView) {
 			
 			table.columns().each( function (c) {
