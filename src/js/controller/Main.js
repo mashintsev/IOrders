@@ -304,6 +304,9 @@ Ext.regController('Main', {
 			if (yn == 'yes'){
 				IOrders.dbeng.clearListeners();
 				
+				IOrders.viewport.setLoading({msg: 'Все стираю ...'});
+				IOrders.dbeng.on ('dbstart', function() {location.reload()});
+				
 				IOrders.dbeng.startDatabase (
 					Ext.decode(localStorage.getItem('metadata')),
 					true
