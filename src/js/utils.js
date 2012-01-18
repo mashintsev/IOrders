@@ -391,7 +391,8 @@ var getDepsData = function(depsStore, tablesStore, view) {
 				table_id: depTable.get('id'),
 				extendable: depTable.get('extendable'),
 				contains: dep.get('contains'),
-				editing: view.editing
+				editing: view.editing,
+				hidden: false
 			}, 'Dep');
 			
 			loadDepData(depRec, depTable, view);
@@ -415,7 +416,8 @@ var prepareDepRecord = function() {
 				table_id: depTable.get('id'),
 				extendable: depTable.get('extendable'),
 				contains: dep.get('contains'),
-				editing: view.editing
+				editing: view.editing,
+				hidden: false
 			}, 'Dep');
 		}
 	});
@@ -449,10 +451,12 @@ var loadDepData = function(depRec, depTable, view) {
 		var count = aggResults.cnt;
 
 		operation.depRec.set('count', count);
+		var depNode = Ext.get(view.depList.getNode(depRec));
+		depNode.show();
 		if (count === 0 && !depRec.get('extendable')) {
-			view.depStore.remove(operation.depRec);
+			depNode.hide();
 		}
-
+		
 	});
 
 	var t = depTable;

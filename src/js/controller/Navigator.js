@@ -70,20 +70,6 @@ Ext.regController('Navigator', {
 
 			if(depRec) {
 				loadDepData(depRec, depTable, view);
-			} else if(objectTable.deps().findExact('table_id', table) !== -1) {
-
-				var dep = objectTable.deps().findRecord('table_id', table, undefined, undefined, true, true);
-				depRec = Ext.ModelMgr.create({
-					name: depTable.get('nameSet'),
-					table_id: depTable.get('id'),
-					extendable: depTable.get('extendable'),
-					contains: dep.get('contains'),
-					editing: view.editing
-				}, 'Dep');
-
-				loadDepData(depRec, depTable, view);
-
-				depStore.add(depRec);
 			}
 		}
 	},
