@@ -366,17 +366,20 @@ var createFilterField = function(objectRecord) {
 function createDepsList(depsStore, tablesStore, view) {
 
 	view.depStore = new Ext.data.Store({
+		
 		model: 'Dep',
 		remoteFilter: false,
 		remoteSort: false,
+		data: getDepsData(depsStore, tablesStore, view),
+		
 		countFilter: new Ext.util.Filter({
 		    filterFn: function(item) {
 		        return item.get('count') > 0 || item.get('extendable');
 		    }
-		}),
-		data: getDepsData(depsStore, tablesStore, view)
+		})
+		
 	});
-
+	
 	return view.depList = Ext.create({
 		xtype: 'list',
 		cls: 'x-deps-list',
@@ -392,9 +395,9 @@ var getDepsData = function(depsStore, tablesStore, view) {
 	var data = [];
 
 	depsStore.each(function(dep) {
-
+		
 		var depTable = tablesStore.getById(dep.get('table_id'));
-
+		
 		if(depTable.get('nameSet') && depTable.get('id') != 'SaleOrderPosition' || view.objectRecord.modelName == 'SaleOrder') {
 			var depRec = Ext.ModelMgr.create({
 				name: depTable.get('nameSet'),
@@ -406,7 +409,7 @@ var getDepsData = function(depsStore, tablesStore, view) {
 			}, 'Dep');
 			
 			loadDepData(depRec, depTable, view);
-
+			
 			data.push(depRec);
 		}
 	});
@@ -427,10 +430,6 @@ var loadDepData = function(depRec, depTable, view) {
 	
 	modelProxy.aggregate(aggOperation, function(operation) {
 		
-		var wasFiltered = view.depStore.isFiltered()
-			&& view.depStore.clearFilter(true)
-		;
-		
 		if (aggCols) {
 			var aggDepResult = '';
 			var aggDepTpl = new Ext.XTemplate('<tpl if="value &gt; 0"><tpl if="name">{name} : </tpl>{[values.value.toFixed(2)]} </tpl>');
@@ -440,15 +439,10 @@ var loadDepData = function(depRec, depTable, view) {
 				aggDepResult += aggDepTpl.apply({name: aggCol.get('label') != depTable.get('nameSet') ? aggCol.get('label') : '', value: aggResults[aggCol.get('name')]});
 			});
 			
-			operation.depRec.editing=true;
 			operation.depRec.set('aggregates', aggDepResult);
 		}
 		
 		operation.depRec.set('count', aggResults.cnt);
-		operation.depRec.editing=false;
-		
-		view.depStore.filter (view.depStore.countFilter);
-		view.depStore.fireEvent ('datachanged', view.depStore);
 		
 	});
 

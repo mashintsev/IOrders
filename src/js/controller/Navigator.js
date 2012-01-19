@@ -17,49 +17,51 @@ Ext.regController('Navigator', {
 	},
 
 	onUploadRecord: function(record) {
-
+		
 		var view = IOrders.viewport.getActiveItem();
-
+		
 		if(view.isXType('navigatorview')) {
-
+			
 			if(view.isObjectView) {
-
+				
 				var objRec = view.objectRecord,
 					form = view.form
 				;
-
+				
 				if(objRec.get('xid') == record.get('xid')) {
-
+					
 					form.loadRecord(record);
 					view.objectRecord = record;
-
+					
 					var statusBar = form.getComponent('statusToolbar');
-
+					
 					if(statusBar) {
+						
 						var segBtn = statusBar.getComponent('processing'),
 							state = record.get('processing');
 						;
-
+						
 						segBtn.getComponent(state).enable();
 						segBtn.setPressed(state, true, true);
-
 						segBtn.items.each(function(b) {
 							b.disable();
 							b.canEnable && b[b.canEnable(state) ? 'enable' : 'disable']();
 							b.pressed && b.enable();
 						});
+						
 					}
 				}
+				
 			} else if(view.isSetView) {
-
+				
 				var store = view.setViewStore,
 					sameRecord = store.findRecord('xid', record.get('xid'), undefined, undefined, true, true)
 				;
-
-				if(sameRecord) {
-
-					sameRecord.set(record.data);
-				}
+				
+				if (sameRecord)
+					sameRecord.set(record.data)
+				;
+				
 			}
 		}
 	},
@@ -84,11 +86,15 @@ Ext.regController('Navigator', {
 				loadDepData(depRec, depTable, view);
 			}
 		}
+		
 	},
 
 	onBackButtonTap: function(options) {
+		
 		var view = options.view;
-		var newCard = Ext.create(view.ownerViewConfig);
+			newCard = Ext.create(view.ownerViewConfig)
+		;
+		
 		if (newCard.isSetView) {
 			Ext.dispatch(Ext.apply(options, {action: 'loadSetViewStore', newCard: newCard, anim: IOrders.viewport.anims.back}));
 		} else {
