@@ -4,7 +4,8 @@ Ext.regController('Main', {
 		
 		var view = options.view,
 			redirectTo = this,
-			action = options.action.replace('Button', options.btn.name + 'Button')
+			btn = options.btn,
+			action = options.action.replace('Button', btn.name + 'Button')
 			;
 		
 		if ( view.isXType('navigatorview') || view.isXType('encashmentview') || view.isXType('uncashmentview')) {
@@ -18,7 +19,13 @@ Ext.regController('Main', {
 				if (options.btn.wasPressed) action = false;
 			}
 		}
-		;
+
+		if(btn.el.hasCls('disable')) {
+			
+			var msg = unavailBtnFuncMessage(btn, view);
+			Ext.Msg.alert(msg.problem, msg.reason + ' '+ msg.howFix);
+			return;
+		}
 
 		var controller = Ext.ControllerManager.get(redirectTo) || redirectTo;
 		if (action && controller && controller[action]) Ext.dispatch(Ext.apply(options, {

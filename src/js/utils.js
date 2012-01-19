@@ -368,11 +368,13 @@ function createDepsList(depsStore, tablesStore, view) {
 	view.depStore = new Ext.data.Store({
 		model: 'Dep',
 		remoteFilter: false,
+		remoteSort: false,
 		countFilter: new Ext.util.Filter({
 		    filterFn: function(item) {
 		        return item.get('count') > 0 || item.get('extendable');
 		    }
 		}),
+		sorters: [{property: 'extendable', direction: 'DESC'}, {property: 'count'}],
 		data: getDepsData(depsStore, tablesStore, view)
 	});
 
@@ -413,25 +415,6 @@ var getDepsData = function(depsStore, tablesStore, view) {
 	return data;
 };
 
-var prepareDepRecord = function() {
-
-	depsStore.each(function(dep) {
-
-		var depTable = tablesStore.getById(dep.get('table_id'));
-
-		if(depTable.get('id') != 'SaleOrderPosition' || view.objectRecord.modelName == 'SaleOrder') {
-			var depRec = Ext.ModelMgr.create({
-				name: depTable.get('nameSet'),
-				table_id: depTable.get('id'),
-				extendable: depTable.get('extendable'),
-				contains: dep.get('contains'),
-				editing: view.editing,
-				hidden: false
-			}, 'Dep');
-		}
-	});
-};
-
 var loadDepData = function(depRec, depTable, view) {
 
 	var modelProxy = Ext.ModelMgr.getModel(depTable.get('id')).prototype.getProxy();
@@ -444,7 +427,8 @@ var loadDepData = function(depRec, depTable, view) {
 	var aggOperation = new Ext.data.Operation({depRec: depRec, filters: filters});
 	
 	modelProxy.aggregate(aggOperation, function(operation) {
-		
+
+		view.depStore.clearFilter();
 		if (aggCols) {
 			var aggDepResult = '';
 			var aggDepTpl = new Ext.XTemplate('<tpl if="value &gt; 0"><tpl if="name">{name} : </tpl>{[values.value.toFixed(2)]} </tpl>');
@@ -459,7 +443,6 @@ var loadDepData = function(depRec, depTable, view) {
 
 		operation.depRec.set('count', aggResults.cnt);
 
-		view.depStore.clearFilter();
 		view.depStore.filter(view.depStore.countFilter);
 	});
 
@@ -633,16 +616,24 @@ var changeBtnText = function(btn) {
 	}
 };
 
-var unavailBtnFuncMessage = function(view, btn) {
+var unavailBtnFuncMessage = function(btn, view) {
 
 	switch(view.xtype) {
 		case 'navigatorview' : {
 			switch (btn.name) {
-			
+				case 'Edit' : {
+					return {
+						problem: 'Редактирование запрещено',
+						reason: 'Запись имеет статус "upload". В данном статусе редактирование запрещено',
+						howFix: 'Для возможности редактирования записи переведите ее в статус "draft"'};
+				}
+				case 'Delete' : {
+					return {reason: '', desc: '', howFix: ''};
+				}
 			}
 		}
 		case 'saleorderview' : {
 			
 		}
 	}
-}
+};

@@ -69,6 +69,7 @@ Ext.regController('Navigator', {
 		;
 
 		if(view.isObjectView) {
+			view.depStore.clearFilter();
 
 			var depStore = view.depStore,
 				depRec = depStore.findRecord('table_id', table, undefined, undefined, true, true),

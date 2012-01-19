@@ -136,7 +136,9 @@ var NavigatorView = Ext.extend(AbstractView, {
 
 			formItems.push(createFieldSet(table.columns(), this.objectRecord.modelName, this));
 
-			var spacerExist = false;
+			var spacerExist = false,
+				btnLockByStatus = this.objectRecord.fields.getByKey('processing') && this.objectRecord.get('processing') !== 'draft'
+			;
 			if(table.get('deletable')) {
 				this.dockedItems[0].items.push(
 					{xtype: 'spacer'},
@@ -145,7 +147,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 						name: 'Delete',
 						text: 'Удалить',
 						scope: this,
-						hidden: this.objectRecord.fields.getByKey('processing') && this.objectRecord.get('processing') !== 'draft'
+						cls: btnLockByStatus ? 'disable' : ''
 					}
 				);
 				spacerExist = true;
@@ -160,7 +162,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 						itemId: 'SaveEdit',
 						name: this.editing ? 'Save' : 'Edit',
 						text: this.editing ? 'Сохранить' : 'Редактировать',
-						hidden: !this.editing && this.objectRecord.fields.getByKey('processing') && this.objectRecord.get('processing') !== 'draft',
+						cls: !this.editing && btnLockByStatus ? 'disable' : '',
 						scope: this
 					}
 				);
