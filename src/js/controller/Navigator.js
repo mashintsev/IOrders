@@ -4,6 +4,14 @@ Ext.regController('Navigator', {
 
 		this.mon(IOrders.xi, 'uploadrecord', this.onUploadRecord, this);
 		this.mon(IOrders.xi, 'tableload', this.onUploadTable, this);
+		IOrders.xi.on ('tableloadfull', function(t) {
+			var s = Ext.getStore (t);
+			
+			if (s && s.autoLoad) {
+				s.currentPage = 1;
+				s.load();
+			}
+		});
 	},
 
 	onUploadRecord: function(record) {
