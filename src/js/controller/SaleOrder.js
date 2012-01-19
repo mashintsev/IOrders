@@ -717,10 +717,7 @@ Ext.regController('SaleOrder', {
 
 	onGroupLastnameButtonTap: function(options) {
 
-		var view = options.view,
-			segBtn = view.getDockedComponent('top').getComponent('ModeChanger'),
-			groupBtn = segBtn.getComponent('Group')
-		;
+		var view = options.view;
 
 		view.productStore.groupField = 'lastName';
 		view.productStore.sorters.removeAll();
@@ -734,10 +731,7 @@ Ext.regController('SaleOrder', {
 
 	onGroupFirstnameButtonTap: function(options) {
 
-		var view = options.view,
-			segBtn = view.getDockedComponent('top').getComponent('ModeChanger'),
-			groupBtn = segBtn.getComponent('Group')
-		;
+		var view = options.view;
 
 		view.productStore.groupField = 'firstName';
 		view.productStore.sorters.removeAll();

@@ -365,7 +365,16 @@ var createFilterField = function(objectRecord) {
 
 function createDepsList(depsStore, tablesStore, view) {
 
-	view.depStore = new Ext.data.Store({model: 'Dep', data: getDepsData(depsStore, tablesStore, view)}); 
+	view.depStore = new Ext.data.Store({
+		model: 'Dep',
+		remoteFilter: false,
+		countFilter: new Ext.util.Filter({
+		    filterFn: function(item) {
+		        return item.get('count') > 0 || item.get('extendable');
+		    }
+		}),
+		data: getDepsData(depsStore, tablesStore, view)
+	});
 
 	return view.depList = Ext.create({
 		xtype: 'list',
@@ -447,16 +456,11 @@ var loadDepData = function(depRec, depTable, view) {
 			
 			operation.depRec.set('aggregates', aggDepResult);
 		}
-		
-		var count = aggResults.cnt;
 
-		operation.depRec.set('count', count);
-		var depNode = Ext.get(view.depList.getNode(depRec));
-		depNode.show();
-		if (count === 0 && !depRec.get('extendable')) {
-			depNode.hide();
-		}
-		
+		operation.depRec.set('count', aggResults.cnt);
+
+		view.depStore.clearFilter();
+		view.depStore.filter(view.depStore.countFilter);
 	});
 
 	var t = depTable;
@@ -628,3 +632,17 @@ var changeBtnText = function(btn) {
 		btn.altText = t;
 	}
 };
+
+var unavailBtnFuncMessage = function(view, btn) {
+
+	switch(view.xtype) {
+		case 'navigatorview' : {
+			switch (btn.name) {
+			
+			}
+		}
+		case 'saleorderview' : {
+			
+		}
+	}
+}
