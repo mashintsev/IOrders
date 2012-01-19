@@ -374,7 +374,6 @@ function createDepsList(depsStore, tablesStore, view) {
 		        return item.get('count') > 0 || item.get('extendable');
 		    }
 		}),
-		sorters: [{property: 'extendable', direction: 'DESC'}, {property: 'count'}],
 		data: getDepsData(depsStore, tablesStore, view)
 	});
 
@@ -624,8 +623,8 @@ var unavailBtnFuncMessage = function(btn, view) {
 				case 'Edit' : {
 					return {
 						problem: 'Редактирование запрещено',
-						reason: 'Запись имеет статус "upload". В данном статусе редактирование запрещено',
-						howFix: 'Для возможности редактирования записи переведите ее в статус "draft"'};
+						reason: 'Редактирование возможно только в статусе "Черновик"',
+						howFix: 'Для возможности редактирования записи переведите ее в статус "Черновик". Из статусов "done", '};
 				}
 				case 'Delete' : {
 					return {reason: '', desc: '', howFix: ''};
