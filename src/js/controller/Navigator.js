@@ -1022,22 +1022,28 @@ Ext.regController('Navigator', {
 	},
 
 	onFacebookFeedButtonTap: function(options) {
-
+		
 		var view = options.view,
 			htmlTpl = new Ext.XTemplate('<div class="fb-like-box" data-href="http://www.facebook.com/iorders"' +
 					' data-width="{width}" data-height="{height}" data-show-faces="false" data-stream="true"' +
 					' data-header="false"></div>');
 		;
-
-		IOrders.viewport.facebookFeedPanel = Ext.create({
+		
+		IOrders.viewport.facebookFeedPanel || (IOrders.viewport.facebookFeedPanel = Ext.create({
 			xtype: 'panel',
 			floating: true,
 			centered: true,
 			layout: 'fit',
 			width: view.getWidth() / 2,
 			height: view.getHeight() * 2 / 3,
-			html: htmlTpl.apply({width: view.getWidth() / 2 - 10, height: view.getHeight() * 2 / 3 - 10})
-		});
+			html: htmlTpl.apply({width: view.getWidth() / 2 - 10, height: view.getHeight() * 2 / 3 - 10}),
+			listeners: {
+				hide: function () {
+					Ext.destroy (IOrders.viewport.facebookFeedPanel);
+					delete IOrders.viewport.facebookFeedPanel;
+				}
+			}
+		}));
 		
 		IOrders.viewport.facebookFeedPanel.show();
 		
@@ -1046,7 +1052,7 @@ Ext.regController('Navigator', {
             status     : true, 
             cookie     : true,
             xfbml      : true,
-            oauth      : true,
-          });
+            oauth      : true
+        });
 	}
 });
