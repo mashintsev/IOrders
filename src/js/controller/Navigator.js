@@ -207,9 +207,9 @@ Ext.regController('Navigator', {
 			editBtn = topBar.getComponent('SaveEdit')
 		;
 	
-		delBtn && delBtn[hide ? 'hide' : 'show']();
+		delBtn && delBtn[hide ? 'addCls' : 'removeCls']('disable');
 	
-		editBtn && editBtn[hide ? 'hide' : 'show']();
+		editBtn && editBtn[hide ? 'addCls' : 'removeCls']('disable');
 	},
 
 	setEditing: function(options) {

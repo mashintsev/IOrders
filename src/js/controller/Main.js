@@ -23,7 +23,12 @@ Ext.regController('Main', {
 		if(btn.el.hasCls('disable')) {
 			
 			var msg = unavailBtnFuncMessage(btn, view);
-			Ext.Msg.alert(msg.problem, msg.reason + ' '+ msg.howFix);
+			Ext.Msg.show({
+	            title : msg.problem,
+	            msg   : msg.reason + ' '+ msg.howFix,
+	            buttons: Ext.MessageBox.OK,
+	            icon  : Ext.MessageBox.INFO
+			});
 			return;
 		}
 
@@ -432,8 +437,8 @@ Ext.regController('Main', {
 			editBtn = topBar.getComponent('SaveEdit')
 		;
 	
-		delBtn && delBtn[hide ? 'hide' : 'show']();
-	
-		editBtn && editBtn[hide ? 'hide' : 'show']();
+		delBtn && delBtn[hide ? 'addCls' : 'removeCls']('disable');
+		
+		editBtn && editBtn[hide ? 'addCls' : 'removeCls']('disable');
 	}
 });

@@ -308,3 +308,7 @@
 	font-weight: bold;
 	color: black;
 }
+
+.x-button.disable {
+	opacity: 0.5;
+}
