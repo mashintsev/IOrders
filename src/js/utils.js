@@ -426,8 +426,11 @@ var loadDepData = function(depRec, depTable, view) {
 	var aggOperation = new Ext.data.Operation({depRec: depRec, filters: filters});
 	
 	modelProxy.aggregate(aggOperation, function(operation) {
-
-		view.depStore.clearFilter();
+		
+		var wasFiltered = view.depStore.isFiltered()
+			&& view.depStore.clearFilter(true)
+		;
+		
 		if (aggCols) {
 			var aggDepResult = '';
 			var aggDepTpl = new Ext.XTemplate('<tpl if="value &gt; 0"><tpl if="name">{name} : </tpl>{[values.value.toFixed(2)]} </tpl>');
@@ -437,12 +440,16 @@ var loadDepData = function(depRec, depTable, view) {
 				aggDepResult += aggDepTpl.apply({name: aggCol.get('label') != depTable.get('nameSet') ? aggCol.get('label') : '', value: aggResults[aggCol.get('name')]});
 			});
 			
+			operation.depRec.editing=true;
 			operation.depRec.set('aggregates', aggDepResult);
 		}
-
+		
 		operation.depRec.set('count', aggResults.cnt);
-
-		view.depStore.filter(view.depStore.countFilter);
+		operation.depRec.editing=false;
+		
+		view.depStore.filter (view.depStore.countFilter);
+		view.depStore.fireEvent ('datachanged', view.depStore);
+		
 	});
 
 	var t = depTable;

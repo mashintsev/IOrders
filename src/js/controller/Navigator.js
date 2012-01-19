@@ -1,9 +1,10 @@
 Ext.regController('Navigator', {
 
 	afterAppLaunch: function(options) {
-
+		
 		this.mon(IOrders.xi, 'uploadrecord', this.onUploadRecord, this);
 		this.mon(IOrders.xi, 'tableload', this.onUploadTable, this);
+		
 		IOrders.xi.on ('tableloadfull', function(t) {
 			var s = Ext.getStore (t);
 			
@@ -12,6 +13,7 @@ Ext.regController('Navigator', {
 				s.load();
 			}
 		});
+		
 	},
 
 	onUploadRecord: function(record) {
@@ -63,20 +65,21 @@ Ext.regController('Navigator', {
 	},
 
 	onUploadTable: function(table) {
-
+		
 		var view = IOrders.viewport.getActiveItem(),
 			tableStore = Ext.getStore('tables')
 		;
-
+		
 		if(view.isObjectView) {
+			
 			view.depStore.clearFilter(true);
-
+			
 			var depStore = view.depStore,
 				depRec = depStore.findRecord('table_id', table, undefined, undefined, true, true),
 				depTable = tableStore.getById(table),
 				objectTable = tableStore.getById(view.objectRecord.modelName)
 			;
-
+			
 			if(depRec) {
 				loadDepData(depRec, depTable, view);
 			}
