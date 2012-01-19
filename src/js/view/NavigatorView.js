@@ -211,6 +211,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 				this.items.push(me.objectList = Ext.create ({
 					
 					xtype: 'list',
+					cls: 'sidefilter',
 					flex: 1,
 					plugins: limit !== 0 ? new Ext.plugins.ListPagingPlugin({autoPaging: true}) : undefined, 
 					itemTpl: getItemTplMeta(this.objectRecord.modelName, {useDeps: false, onlyKey: true}).itemTpl,
