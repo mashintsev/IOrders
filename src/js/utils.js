@@ -296,7 +296,7 @@ var createFieldSet = function(columnsStore, modelName, view) {
 					fieldConfig = {
 						xtype: 'datepickerfield',
 						picker: {
-							yearFrom: 2011,
+							yearFrom: 2012,
 							yearTo  : 2012,
 							slotOrder: ['day', 'month', 'year']
 						}
