@@ -427,7 +427,7 @@ Ext.regController('Main', {
 		
 		view.fireEvent ('saved', rec);
 
-		rec.fields.getByKey('processing') && this.controlButtonsVisibilities(view, !view.editing && rec.get('processing') != 'draft');
+		rec.fields.getByKey('processing') && this.controlButtonsVisibilities(view, !view.editing && rec.get('processing') != 'draft' && !rec.get('serverPhantom'));
 	},
 
 	controlButtonsVisibilities: function(view, hide) {

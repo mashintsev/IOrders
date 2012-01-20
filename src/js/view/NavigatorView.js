@@ -138,7 +138,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 
 			var spacerExist = false,
 				btnLockByStatus = this.objectRecord.fields.getByKey('processing')
-				&& this.objectRecord.get('processing') !== 'draft'
+					&& this.objectRecord.get('processing') !== 'draft' && !this.objectRecord.get('serverPhantom')
 			;
 			
 			if ( table.get('deletable') ) {
