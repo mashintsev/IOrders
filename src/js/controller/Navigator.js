@@ -50,6 +50,8 @@ Ext.regController('Navigator', {
 						});
 						
 					}
+
+					record.fields.getByKey('processing') && this.controlButtonsVisibilities(view, record.get('processing') != 'draft' && !record.get('serverPhantom'));
 				}
 				
 			} else if(view.isSetView) {
@@ -234,7 +236,7 @@ Ext.regController('Navigator', {
 		var rec = undefined;
 
 		if(options.view.isObjectView) {
-			rec = Ext.ModelMgr.create({}, options.view.objectRecord.modelName);
+			rec = Ext.ModelMgr.create({serverPhantom: true}, options.view.objectRecord.modelName);
 			/**
 			 * TODO Пока создается пустая сущность.
 			 * Возможно нужно проставлять все поля-паренты как у сущности из которой создалась новая
@@ -297,7 +299,7 @@ Ext.regController('Navigator', {
 					
 				Ext.defer ( function () {
 					
-					rec = Ext.ModelMgr.create({}, createdRecordModelName);
+					rec = Ext.ModelMgr.create({serverPhantom: true}, createdRecordModelName);
 					rec.set( objectRecord.modelName.toLowerCase(), objectRecord.getId() );
 					
 					if (rec.modelName === 'SaleOrder')
@@ -428,7 +430,7 @@ Ext.regController('Navigator', {
 				isWhite: debt.get('isWhite'), datetime: new Date().format('Y-m-d H:i:s'),
 				customer: view.customerRecord.getId(), debt: debt.getId(),
 				summ: parseFloat(debt.get('encashSumm')).toFixed(2),
-				uncashment: undefined
+				uncashment: undefined, serverPhantom: true
 			}, 'Encashment'));
 		});
 		
@@ -446,7 +448,7 @@ Ext.regController('Navigator', {
 		Ext.dispatch(Ext.apply(options, {
 			action: 'createAndActivateView',
 			editing: true,
-			record: Ext.ModelMgr.create({customer: view.customerSelect.getValue(), date: getNextWorkDay()}, 'EncashmentRequest'),
+			record: Ext.ModelMgr.create({customer: view.customerSelect.getValue(), date: getNextWorkDay(), serverPhantom: true}, 'EncashmentRequest'),
 			config: {ownerViewConfig: {xtype: 'encashmentview', partnerRecord: view.partnerRecord, customerRecord: view.objectRecord, ownerViewConfig: view.ownerViewConfig}}
 		}));
 	},
@@ -578,7 +580,8 @@ Ext.regController('Navigator', {
 			var uncashRec = Ext.ModelMgr.create({
 					totalSumm: totalSumm.toFixed(2),
 					totalSummWhite: totalSummWhite.toFixed(2),
-					datetime: new Date().format('Y-m-d H:i:s')
+					datetime: new Date().format('Y-m-d H:i:s'),
+					serverPhantom: true
 				}, 'Uncashment'
 			);
 			
