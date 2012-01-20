@@ -4,7 +4,8 @@ Ext.regController('Main', {
 		
 		var view = options.view,
 			redirectTo = this,
-			action = options.action.replace('Button', options.btn.name + 'Button')
+			btn = options.btn,
+			action = options.action.replace('Button', btn.name + 'Button')
 			;
 		
 		if ( view.isXType('navigatorview') || view.isXType('encashmentview') || view.isXType('uncashmentview')) {
@@ -18,7 +19,18 @@ Ext.regController('Main', {
 				if (options.btn.wasPressed) action = false;
 			}
 		}
-		;
+
+		if(btn.el.hasCls('disable')) {
+			
+			var msg = unavailBtnFuncMessage(btn, view);
+			Ext.Msg.show({
+	            title : msg.problem,
+	            msg   : msg.reason + ' '+ msg.howFix,
+	            buttons: Ext.MessageBox.OK,
+	            icon  : Ext.MessageBox.INFO
+			});
+			return;
+		}
 
 		var controller = Ext.ControllerManager.get(redirectTo) || redirectTo;
 		if (action && controller && controller[action]) Ext.dispatch(Ext.apply(options, {
@@ -304,6 +316,9 @@ Ext.regController('Main', {
 			if (yn == 'yes'){
 				IOrders.dbeng.clearListeners();
 				
+				IOrders.viewport.setLoading({msg: 'Все стираю ...'});
+				IOrders.dbeng.on ('dbstart', function() {location.reload()});
+				
 				IOrders.dbeng.startDatabase (
 					Ext.decode(localStorage.getItem('metadata')),
 					true
@@ -412,7 +427,7 @@ Ext.regController('Main', {
 		
 		view.fireEvent ('saved', rec);
 
-		rec.fields.getByKey('processing') && this.controlButtonsVisibilities(view, !view.editing && rec.get('processing') != 'draft');
+		rec.fields.getByKey('processing') && this.controlButtonsVisibilities(view, !view.editing && rec.get('processing') != 'draft' && !rec.get('serverPhantom'));
 	},
 
 	controlButtonsVisibilities: function(view, hide) {
@@ -422,8 +437,8 @@ Ext.regController('Main', {
 			editBtn = topBar.getComponent('SaveEdit')
 		;
 	
-		delBtn && delBtn[hide ? 'hide' : 'show']();
-	
-		editBtn && editBtn[hide ? 'hide' : 'show']();
+		delBtn && delBtn[hide ? 'addCls' : 'removeCls']('disable');
+		
+		editBtn && editBtn[hide ? 'addCls' : 'removeCls']('disable');
 	}
 });

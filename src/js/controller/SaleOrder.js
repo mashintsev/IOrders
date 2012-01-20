@@ -537,7 +537,7 @@ Ext.regController('SaleOrder', {
 		Ext.each (view.productList.getEl().query('.x-list-item .active'), addActiveCls);
 
 		//categoryList
-		view.productCategoryList.setScrollable('vertical');
+		view.productCategoryList.scroller.enable();
 		Ext.each(view.productCategoryList.getEl().query('.x-list-item .active'), addActiveCls);
 	},
 	
@@ -555,7 +555,7 @@ Ext.regController('SaleOrder', {
 		Ext.each(view.productList.getEl().query('.x-list-group-items'), removeActiveCls);
 
 		view.productCategoryList.scroller.scrollTo({y:0});
-		view.productCategoryList.setScrollable(false);
+		view.productCategoryList.scroller.disable();
 		Ext.each(view.productCategoryList.getEl().query('.x-list-group-items'), removeActiveCls);
 	},
 
@@ -717,10 +717,7 @@ Ext.regController('SaleOrder', {
 
 	onGroupLastnameButtonTap: function(options) {
 
-		var view = options.view,
-			segBtn = view.getDockedComponent('top').getComponent('ModeChanger'),
-			groupBtn = segBtn.getComponent('Group')
-		;
+		var view = options.view;
 
 		view.productStore.groupField = 'lastName';
 		view.productStore.sorters.removeAll();
@@ -734,10 +731,7 @@ Ext.regController('SaleOrder', {
 
 	onGroupFirstnameButtonTap: function(options) {
 
-		var view = options.view,
-			segBtn = view.getDockedComponent('top').getComponent('ModeChanger'),
-			groupBtn = segBtn.getComponent('Group')
-		;
+		var view = options.view;
 
 		view.productStore.groupField = 'firstName';
 		view.productStore.sorters.removeAll();

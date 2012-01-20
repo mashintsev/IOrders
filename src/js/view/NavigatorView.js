@@ -136,8 +136,13 @@ var NavigatorView = Ext.extend(AbstractView, {
 
 			formItems.push(createFieldSet(table.columns(), this.objectRecord.modelName, this));
 
-			var spacerExist = false;
-			if(table.get('deletable')) {
+			var spacerExist = false,
+				btnLockByStatus = this.objectRecord.fields.getByKey('processing')
+					&& this.objectRecord.get('processing') !== 'draft' && !this.objectRecord.get('serverPhantom')
+			;
+			
+			if ( table.get('deletable') ) {
+				
 				this.dockedItems[0].items.push(
 					{xtype: 'spacer'},
 					{
@@ -145,14 +150,16 @@ var NavigatorView = Ext.extend(AbstractView, {
 						name: 'Delete',
 						text: 'Удалить',
 						scope: this,
-						hidden: this.objectRecord.fields.getByKey('processing') && this.objectRecord.get('processing') !== 'draft'
+						cls: btnLockByStatus ? 'disable' : ''
 					}
 				);
+				
 				spacerExist = true;
+				
 			}
-
+			
 			if(table.get('editable') || (this.editing && table.get('extendable'))) {
-
+				
 				spacerExist || this.dockedItems[0].items.push({xtype: 'spacer'});
 				this.dockedItems[0].items.push(
 					{itemId: 'Cancel', name: 'Cancel', text: 'Отменить', hidden: true, scope: this},
@@ -160,7 +167,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 						itemId: 'SaveEdit',
 						name: this.editing ? 'Save' : 'Edit',
 						text: this.editing ? 'Сохранить' : 'Редактировать',
-						hidden: !this.editing && this.objectRecord.fields.getByKey('processing') && this.objectRecord.get('processing') !== 'draft',
+						cls: !this.editing && btnLockByStatus ? 'disable' : '',
 						scope: this
 					}
 				);
@@ -201,44 +208,49 @@ var NavigatorView = Ext.extend(AbstractView, {
 				store.load({limit:  limit});
 				store.currentPage = curPage;
 
-				this.items.push(me.objectList = Ext.create({
+				this.items.push(me.objectList = Ext.create ({
+					
 					xtype: 'list',
+					cls: 'sidefilter',
 					flex: 1,
 					plugins: limit !== 0 ? new Ext.plugins.ListPagingPlugin({autoPaging: true}) : undefined, 
 					itemTpl: getItemTplMeta(this.objectRecord.modelName, {useDeps: false, onlyKey: true}).itemTpl,
 					store: store,
+					
 					initComponent: function() {
 						var scroll = this.scroll;
 						Ext.List.prototype.initComponent.apply(this, arguments);
 						if (typeof scroll == 'object')
 							this.scroll = scroll;
 					},
+					
 					listeners: {
+						
 						scope: this,
+						
 						refresh: function(list) {
-
 							if(list.store.getCount() > 1) {
-
+								
 								var idx = list.store.findExact('id', this.objectRecord.getId());
+								
 								list.selModel.select(idx);
-
+								
 								item = Ext.fly(list.getNode(idx));
-
 								item && list.scroller.setOffset({
 									y: -item.getOffsetsTo(list.scrollEl)[1]
 								});
 							}
 						},
+						
 						selectionchange: function(selModel, recs) {
-
+							
 							if(recs.length) {
-
-								Ext.dispatch({
+								Ext.dispatch ({
 									controller: 'Navigator',
 									action: 'onObjectListItemSelect',
 									selected: recs[0],
 									view: me
-								});
+								})
 							}
 						}
 					}

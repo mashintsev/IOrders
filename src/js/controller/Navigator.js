@@ -1,96 +1,102 @@
 Ext.regController('Navigator', {
 
 	afterAppLaunch: function(options) {
-
+		
 		this.mon(IOrders.xi, 'uploadrecord', this.onUploadRecord, this);
 		this.mon(IOrders.xi, 'tableload', this.onUploadTable, this);
+		
+		IOrders.xi.on ('tableloadfull', function(t) {
+			var s = Ext.getStore (t);
+			
+			if (s && s.autoLoad) {
+				s.currentPage = 1;
+				s.load();
+			}
+		});
+		
 	},
 
 	onUploadRecord: function(record) {
-
+		
 		var view = IOrders.viewport.getActiveItem();
-
+		
 		if(view.isXType('navigatorview')) {
-
+			
 			if(view.isObjectView) {
-
+				
 				var objRec = view.objectRecord,
 					form = view.form
 				;
-
+				
 				if(objRec.get('xid') == record.get('xid')) {
-
+					
 					form.loadRecord(record);
 					view.objectRecord = record;
-
+					
 					var statusBar = form.getComponent('statusToolbar');
-
+					
 					if(statusBar) {
+						
 						var segBtn = statusBar.getComponent('processing'),
 							state = record.get('processing');
 						;
-
+						
 						segBtn.getComponent(state).enable();
 						segBtn.setPressed(state, true, true);
-
 						segBtn.items.each(function(b) {
 							b.disable();
 							b.canEnable && b[b.canEnable(state) ? 'enable' : 'disable']();
 							b.pressed && b.enable();
 						});
+						
 					}
-				}
-			} else if(view.isSetView) {
 
+					record.fields.getByKey('processing') && this.controlButtonsVisibilities(view, record.get('processing') != 'draft' && !record.get('serverPhantom'));
+				}
+				
+			} else if(view.isSetView) {
+				
 				var store = view.setViewStore,
 					sameRecord = store.findRecord('xid', record.get('xid'), undefined, undefined, true, true)
 				;
-
-				if(sameRecord) {
-
-					sameRecord.set(record.data);
-				}
+				
+				if (sameRecord)
+					sameRecord.set(record.data)
+				;
+				
 			}
 		}
 	},
 
 	onUploadTable: function(table) {
-
+		
 		var view = IOrders.viewport.getActiveItem(),
 			tableStore = Ext.getStore('tables')
 		;
-
+		
 		if(view.isObjectView) {
-
+			
+			view.depStore.clearFilter(true);
+			
 			var depStore = view.depStore,
 				depRec = depStore.findRecord('table_id', table, undefined, undefined, true, true),
 				depTable = tableStore.getById(table),
 				objectTable = tableStore.getById(view.objectRecord.modelName)
 			;
-
+			
 			if(depRec) {
 				loadDepData(depRec, depTable, view);
-			} else if(objectTable.deps().findExact('table_id', table) !== -1) {
-
-				var dep = objectTable.deps().findRecord('table_id', table, undefined, undefined, true, true);
-				depRec = Ext.ModelMgr.create({
-					name: depTable.get('nameSet'),
-					table_id: depTable.get('id'),
-					extendable: depTable.get('extendable'),
-					contains: dep.get('contains'),
-					editing: view.editing
-				}, 'Dep');
-
-				loadDepData(depRec, depTable, view);
-
-				depStore.add(depRec);
 			}
 		}
+		
 	},
 
 	onBackButtonTap: function(options) {
+		
 		var view = options.view;
-		var newCard = Ext.create(view.ownerViewConfig);
+			newCard = Ext.create(view.ownerViewConfig)
+		;
+		
 		if (newCard.isSetView) {
 			Ext.dispatch(Ext.apply(options, {action: 'loadSetViewStore', newCard: newCard, anim: IOrders.viewport.anims.back}));
 		} else {
@@ -151,7 +157,7 @@ Ext.regController('Navigator', {
 				toolbar.getComponent('Cancel').hide();
 				Ext.dispatch(Ext.apply(options, {action: 'setEditing', editing: false}));
 
-				rec.fields.getByKey('processing') && this.controlButtonsVisibilities(view, rec.get('processing') != 'draft');
+				rec.fields.getByKey('processing') && this.controlButtonsVisibilities(view, rec.get('processing') != 'draft' && !rec.get('serverPhantom'));
 			}
 			
 			rec.save();
@@ -212,9 +218,9 @@ Ext.regController('Navigator', {
 			editBtn = topBar.getComponent('SaveEdit')
 		;
 	
-		delBtn && delBtn[hide ? 'hide' : 'show']();
+		delBtn && delBtn[hide ? 'addCls' : 'removeCls']('disable');
 	
-		editBtn && editBtn[hide ? 'hide' : 'show']();
+		editBtn && editBtn[hide ? 'addCls' : 'removeCls']('disable');
 	},
 
 	setEditing: function(options) {
@@ -230,7 +236,7 @@ Ext.regController('Navigator', {
 		var rec = undefined;
 
 		if(options.view.isObjectView) {
-			rec = Ext.ModelMgr.create({}, options.view.objectRecord.modelName);
+			rec = Ext.ModelMgr.create({serverPhantom: true}, options.view.objectRecord.modelName);
 			/**
 			 * TODO Пока создается пустая сущность.
 			 * Возможно нужно проставлять все поля-паренты как у сущности из которой создалась новая
@@ -293,7 +299,7 @@ Ext.regController('Navigator', {
 					
 				Ext.defer ( function () {
 					
-					rec = Ext.ModelMgr.create({}, createdRecordModelName);
+					rec = Ext.ModelMgr.create({serverPhantom: true}, createdRecordModelName);
 					rec.set( objectRecord.modelName.toLowerCase(), objectRecord.getId() );
 					
 					if (rec.modelName === 'SaleOrder')
@@ -424,7 +430,7 @@ Ext.regController('Navigator', {
 				isWhite: debt.get('isWhite'), datetime: new Date().format('Y-m-d H:i:s'),
 				customer: view.customerRecord.getId(), debt: debt.getId(),
 				summ: parseFloat(debt.get('encashSumm')).toFixed(2),
-				uncashment: undefined
+				uncashment: undefined, serverPhantom: true
 			}, 'Encashment'));
 		});
 		
@@ -442,7 +448,7 @@ Ext.regController('Navigator', {
 		Ext.dispatch(Ext.apply(options, {
 			action: 'createAndActivateView',
 			editing: true,
-			record: Ext.ModelMgr.create({customer: view.customerSelect.getValue(), date: getNextWorkDay()}, 'EncashmentRequest'),
+			record: Ext.ModelMgr.create({customer: view.customerSelect.getValue(), date: getNextWorkDay(), serverPhantom: true}, 'EncashmentRequest'),
 			config: {ownerViewConfig: {xtype: 'encashmentview', partnerRecord: view.partnerRecord, customerRecord: view.objectRecord, ownerViewConfig: view.ownerViewConfig}}
 		}));
 	},
@@ -574,7 +580,8 @@ Ext.regController('Navigator', {
 			var uncashRec = Ext.ModelMgr.create({
 					totalSumm: totalSumm.toFixed(2),
 					totalSummWhite: totalSummWhite.toFixed(2),
-					datetime: new Date().format('Y-m-d H:i:s')
+					datetime: new Date().format('Y-m-d H:i:s'),
+					serverPhantom: true
 				}, 'Uncashment'
 			);
 			
@@ -1018,22 +1025,28 @@ Ext.regController('Navigator', {
 	},
 
 	onFacebookFeedButtonTap: function(options) {
-
+		
 		var view = options.view,
 			htmlTpl = new Ext.XTemplate('<div class="fb-like-box" data-href="http://www.facebook.com/iorders"' +
 					' data-width="{width}" data-height="{height}" data-show-faces="false" data-stream="true"' +
 					' data-header="false"></div>');
 		;
-
-		IOrders.viewport.facebookFeedPanel = Ext.create({
+		
+		IOrders.viewport.facebookFeedPanel || (IOrders.viewport.facebookFeedPanel = Ext.create({
 			xtype: 'panel',
 			floating: true,
 			centered: true,
 			layout: 'fit',
 			width: view.getWidth() / 2,
 			height: view.getHeight() * 2 / 3,
-			html: htmlTpl.apply({width: view.getWidth() / 2 - 10, height: view.getHeight() * 2 / 3 - 10})
-		});
+			html: htmlTpl.apply({width: view.getWidth() / 2 - 10, height: view.getHeight() * 2 / 3 - 10}),
+			listeners: {
+				hide: function () {
+					Ext.destroy (IOrders.viewport.facebookFeedPanel);
+					delete IOrders.viewport.facebookFeedPanel;
+				}
+			}
+		}));
 		
 		IOrders.viewport.facebookFeedPanel.show();
 		
@@ -1042,7 +1055,7 @@ Ext.regController('Navigator', {
             status     : true, 
             cookie     : true,
             xfbml      : true,
-            oauth      : true,
-          });
+            oauth      : true
+        });
 	}
 });

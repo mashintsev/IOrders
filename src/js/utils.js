@@ -296,7 +296,7 @@ var createFieldSet = function(columnsStore, modelName, view) {
 					fieldConfig = {
 						xtype: 'datepickerfield',
 						picker: {
-							yearFrom: 2011,
+							yearFrom: 2012,
 							yearTo  : 2012,
 							slotOrder: ['day', 'month', 'year']
 						}
@@ -365,8 +365,21 @@ var createFilterField = function(objectRecord) {
 
 function createDepsList(depsStore, tablesStore, view) {
 
-	view.depStore = new Ext.data.Store({model: 'Dep', data: getDepsData(depsStore, tablesStore, view)}); 
-
+	view.depStore = new Ext.data.Store({
+		
+		model: 'Dep',
+		remoteFilter: false,
+		remoteSort: false,
+		data: getDepsData(depsStore, tablesStore, view),
+		
+		countFilter: new Ext.util.Filter({
+		    filterFn: function(item) {
+		        return item.get('count') > 0 || item.get('extendable');
+		    }
+		})
+		
+	});
+	
 	return view.depList = Ext.create({
 		xtype: 'list',
 		cls: 'x-deps-list',
@@ -382,43 +395,26 @@ var getDepsData = function(depsStore, tablesStore, view) {
 	var data = [];
 
 	depsStore.each(function(dep) {
-
+		
 		var depTable = tablesStore.getById(dep.get('table_id'));
-
+		
 		if(depTable.get('nameSet') && depTable.get('id') != 'SaleOrderPosition' || view.objectRecord.modelName == 'SaleOrder') {
 			var depRec = Ext.ModelMgr.create({
 				name: depTable.get('nameSet'),
 				table_id: depTable.get('id'),
 				extendable: depTable.get('extendable'),
 				contains: dep.get('contains'),
-				editing: view.editing
+				editing: view.editing,
+				hidden: false
 			}, 'Dep');
 			
 			loadDepData(depRec, depTable, view);
-
+			
 			data.push(depRec);
 		}
 	});
 	
 	return data;
-};
-
-var prepareDepRecord = function() {
-
-	depsStore.each(function(dep) {
-
-		var depTable = tablesStore.getById(dep.get('table_id'));
-
-		if(depTable.get('id') != 'SaleOrderPosition' || view.objectRecord.modelName == 'SaleOrder') {
-			var depRec = Ext.ModelMgr.create({
-				name: depTable.get('nameSet'),
-				table_id: depTable.get('id'),
-				extendable: depTable.get('extendable'),
-				contains: dep.get('contains'),
-				editing: view.editing
-			}, 'Dep');
-		}
-	});
 };
 
 var loadDepData = function(depRec, depTable, view) {
@@ -446,13 +442,8 @@ var loadDepData = function(depRec, depTable, view) {
 			operation.depRec.set('aggregates', aggDepResult);
 		}
 		
-		var count = aggResults.cnt;
-
-		operation.depRec.set('count', count);
-		if (count === 0 && !depRec.get('extendable')) {
-			view.depStore.remove(operation.depRec);
-		}
-
+		operation.depRec.set('count', aggResults.cnt);
+		
 	});
 
 	var t = depTable;
@@ -622,5 +613,30 @@ var changeBtnText = function(btn) {
 		var t = btn.text;
 		btn.setText(btn.altText);
 		btn.altText = t;
+	}
+};
+
+var unavailBtnFuncMessage = function(btn, view) {
+
+	switch(view.xtype) {
+		case 'navigatorview' : {
+			switch (btn.name) {
+				case 'Edit' : {
+					return {
+						problem: 'Редактирование запрещено!',
+						reason: 'Редактирование возможно только в статусе "Черновик"',
+						howFix: 'Для редактирования записи переведите ее в статус "Черновик". Из статусов "Проверка", "На складе" это сделать нельзя.'};
+				}
+				case 'Delete' : {
+					return {
+						problem: 'Нельзя удалить запись!',
+						reason: 'Удалить запись можно только в статусе "Черновик"',
+						howFix: 'Для удаления записи переведите ее в статус "Черновик". Из статусов "Проверка", "На складе" это сделать нельзя.'};
+				}
+			}
+		}
+		case 'saleorderview' : {
+			
+		}
 	}
 };
