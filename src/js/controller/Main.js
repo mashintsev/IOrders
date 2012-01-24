@@ -225,6 +225,8 @@ Ext.regController('Main', {
 			IOrders.xi.username = login;
 			IOrders.xi.password = password;
 			
+			IOrders.viewport.setLoading('Проверяю пароль');
+			
 			IOrders.xi.reconnect(IOrders.getMetadata);
 		} else {
 			Ext.Msg.alert('Авторизация', 'Введите логин и пароль');

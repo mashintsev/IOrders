@@ -55,19 +55,6 @@ Ext.regApplication({
 					tStore.load(function() {IOrders.init();});
 					
 					if (db.clean){
-						vp.setLoading(true);
-						vp.mon (
-							IOrders.xi.connection,
-							'requestcomplete',
-							function(){ vp.setLoading(false); },
-							vp, {delay: 1000}
-						);
-						vp.mon (
-							IOrders.xi.connection,
-							'requestexception',
-							function(){ vp.setLoading(false); },
-							vp, {delay: 1000}
-						);
 						IOrders.xi.download(IOrders.dbeng);
 					}
 				},
@@ -91,6 +78,8 @@ Ext.regApplication({
 					command: 'metadata',
 					success: function(response) {
 						var m = response.responseXML;
+						
+						IOrders.viewport.setLoading(false);
 						
 						console.log(m);
 						
@@ -173,15 +162,15 @@ Ext.regApplication({
 							});
 						}
 				});};
-
-					
+				
+				
 				this.dbeng.on ('dbstart', r);
 				this.dbeng.on ('upgradefail', f);
 			}
 			
 			this.dbeng.startDatabase(metadata);
-
-			Ext.dispatch({controller: 'Navigator', action: 'afterAppLaunch'});
-		}
+		};
+		
+		Ext.dispatch({controller: 'Navigator', action: 'afterAppLaunch'});
 	}
 });
