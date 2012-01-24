@@ -167,7 +167,7 @@ Ext.regController('SaleOrder', {
 
 						newCard.productStore.on('load', newCard.offerCategoryStore.initLastActive, newCard.offerCategoryStore);
 
-						var saleOrderPositionStore = newCard.saleOrderPositionStore = createStore('SaleOrderPosition', {
+						newCard.saleOrderPositionStore = newCard.saleOrderPositionStore = createStore('SaleOrderPosition', {
 							remoteFilter: true,
 							filters: [{
 								property: 'saleorder',
@@ -175,10 +175,40 @@ Ext.regController('SaleOrder', {
 							}]
 						});
 
+						newCard.saleOrderPositionStore.load({
+							limit: 0,
+							callback: function(records, operation, s) {
+								if(s) {
+
+									var customer = newCard.saleOrder.get('customer');
+
+									if (customer) {
+										Ext.ModelMgr.getModel('Customer').load(customer, {
+											success: function(rec) {
+												newCard.customerRecord = rec;
+												if (newCard.saleOrder.get('isBonus')){
+													newCard.bonusCost = rec.get('bonusCost') + newCard.saleOrder.get('totalCost');
+												};
+												Ext.dispatch({
+													controller: 'SaleOrder',
+													action: 'calculateTotalCost',
+													view: newCard
+												});
+											}
+										});
+									} else {
+										console.log ('SaleOrder: empty customer');
+									}
+									
+									IOrders.viewport.setActiveItem(newCard);
+								}
+							}
+						});
+
 						newCard.productList = newCard.productPanel.add(Ext.apply(offerProductList, {flex: 3, store: newCard.productStore}));
 						newCard.productListIndexBar = newCard.productPanel.add(new HorizontalIndexBar({hidden: !newCard.indexBarMode, list: newCard.productList}));
 
-						newCard.productStore.load({
+						/*newCard.productStore.load({
 							limit: 0,
 							callback: function(r, o, s) {
 								
@@ -272,7 +302,7 @@ Ext.regController('SaleOrder', {
 									});
 								} else failureCb('остатков');
 							}
-						});
+						});*/
 					}
 				}
 			});
@@ -489,15 +519,21 @@ Ext.regController('SaleOrder', {
 		
 		productStore.clearFilter(true);
 		
-		rec && filters.push({
-			property: 'category',
-			value: rec.get('category')
-		});
+		rec && filters.push(
+			{
+				property: 'category',
+				value: rec.get('category')
+			},
+			{
+				property: 'customer',
+				value: view.saleOrder.get('customer')
+			}
+		);
 		
 		view.isShowSaleOrder && filters.push(productStore.volumeFilter);
 		view.bonusMode && filters.push(productStore.bonusFilter);
 
-		productStore.filter(filters);
+		productStore.load({limit : 0, filters: filters});
 
 		view.productListIndexBar.loadIndex();
 		view.productList.scroller.scrollTo ({y:0});
