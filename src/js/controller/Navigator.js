@@ -236,11 +236,8 @@ Ext.regController('Navigator', {
 		var rec = undefined;
 
 		if(options.view.isObjectView) {
-			rec = Ext.ModelMgr.create({serverPhantom: true}, options.view.objectRecord.modelName);
-			/**
-			 * TODO Пока создается пустая сущность.
-			 * Возможно нужно проставлять все поля-паренты как у сущности из которой создалась новая
-			 */
+
+			rec = Ext.ModelMgr.create(Ext.applyIf({serverPhantom: true, id: ''}, options.view.objectRecord.data), options.view.objectRecord.modelName);
 			
 		} else if(options.view.isSetView) {
 			rec = Ext.ModelMgr.create({}, options.view.tableRecord);
@@ -251,9 +248,11 @@ Ext.regController('Navigator', {
 			);
 		}
 		
-		if (rec.modelName === 'SaleOrder' || rec.modelName === 'EncashmentRequest')
-			rec.set('date', getNextWorkDay())
-		;
+		if (rec.modelName === 'SaleOrder' || rec.modelName === 'EncashmentRequest') {
+			rec.set('date', getNextWorkDay());
+			rec.set('processing', 'upload');
+			rec.set('totalCost', '');
+		}
 		
 		var oldCard = IOrders.viewport.getActiveItem();
 		if(rec.modelName === 'Uncashment') {
