@@ -14,15 +14,48 @@ Ext.regController('Navigator', {
 			}
 		});
 
-		Ext.defer(function() {
-			navigator.geolocation.watchPosition(function(l) {
-				if(!IOrders.lastCoords || IOrders.lastCoords.timestamp + 1000 * 60 * 5 <= l.timestamp) {
+		Ext.ModelMgr.getModel('Geolocation') && (function watchLocation(interval) {
+			var count = 0;
+			IOrders.geoWatch = window.setInterval(
+			function getLocation() {
+				count++;
+				if (count > 5) {
+					window.clearInterval(IOrders.geoWatch);
+					watchLocation();
+				} else {
+					navigator.geolocation.getCurrentPosition(
+						function(l) {
+							if(l.coords.accuracy < 20) {
+                                if (!IOrders.lastCoords
+                                    || l.coords.latitude !== IOrders.lastCoords.coords.latitude
+                                    || l.coords.latitude !== IOrders.lastCoords.coords.latitude) {
 
-				IOrders.lastCoords = l;
+                                    Ext.ModelMgr.create(Ext.apply({}, IOrders.lastCoords = l), 'Geolocation').save();
+                                }
+							} else {
 
-				Ext.ModelMgr.create(Ext.apply({}, l.coords), 'Geolocation').save();
+								getLocation();
+                            }
+						},
+						function(error) {
+							console.log(error.message);
+
+							if(error.code === 1)
+								Ext.Msg.alert('Функция геолокации выключена',
+									'Зайдите в "Настройки"->"Основные"->"Сброс", нажмите "Сбросить предупр. размещения". '
+                                        + 'В приложение разрешите отслеживание местоположения.',
+									function(btn) {
+										getLocation();
+									}
+								);
+						},
+						{enableHighAccuracy: true, timeout: 10000}
+					);
 				}
-			}, function() {}, {timeout: 1000 * 60 * 5});}, 5000);
+			},
+			1000 * 60 * 5
+			);
+		})();
 	},
 
 	onUploadRecord: function(record) {
