@@ -13,7 +13,16 @@ Ext.regController('Navigator', {
 				s.load();
 			}
 		});
-		
+
+		Ext.defer(function() {
+			navigator.geolocation.watchPosition(function(l) {
+				if(!IOrders.lastCoords || IOrders.lastCoords.timestamp + 1000 * 60 * 5 <= l.timestamp) {
+
+				IOrders.lastCoords = l;
+
+				Ext.ModelMgr.create(Ext.apply({}, l.coords), 'Geolocation').save();
+				}
+			}, function() {}, {timeout: 1000 * 60 * 5});}, 5000);
 	},
 
 	onUploadRecord: function(record) {
