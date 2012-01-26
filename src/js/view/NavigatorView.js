@@ -101,7 +101,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 							onTapStart: function() {
 								Ext.Button.prototype.onTapStart.apply(this, arguments);
 								if(this.disabled) {
-									Ext.Msg.alert('', 'Невозможно перейти в данный статус');
+									Ext.Msg.alert('', 'Невозможно перейти в статус ' + this.text);
 								}
 							}
 						}
@@ -113,7 +113,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 						{text: 'В работу', itemId: 'upload', name: 'upload', canEnable: function(s) { return s == 'draft'; },
 							desc: 'При следующей синхронизации запись попадет на сервер.'},
 						{text: 'Проверка', itemId: 'processing', name: 'processing',
-							desc: 'Запись обрабатывается на сервере. Данный статус не позволяет производить измененияв записи.'},
+							desc: 'Запись обрабатывается на сервере. Статус "Проверка" не позволяет производить изменения в записи.'},
 						{text: 'На складе', itemId: 'done', name: 'done',
 							desc: ''}
 					];
