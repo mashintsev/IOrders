@@ -263,6 +263,10 @@ String.right = function (str, n){
     }
 };
 
+Ext.override(Ext.data.Store, {
+	autoDestroy: true
+});
+
 Ext.MessageBox.YESNO[1].text = 'Да';
 Ext.MessageBox.YESNO[0].text = 'Нет';
 Ext.Picker.prototype.doneButton = 'OK';

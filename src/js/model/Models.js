@@ -91,6 +91,7 @@ var regStore = function(name, config) {
 	
 	Ext.regStore(name, Ext.apply({
 		model: name,
+		autoDestroy: false,
 		remoteFilter: true,
 		remoteSort: true, 
 		proxy: {

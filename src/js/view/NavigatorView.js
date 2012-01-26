@@ -96,24 +96,44 @@ var NavigatorView = Ext.extend(AbstractView, {
 				
 				if (String.right(cName, 10) == 'processing') {
 					var statusButtons = [],
-						state = me.objectRecord.get(cName) || 'draft'
+						state = me.objectRecord.get(cName) || 'draft',
+						btnCfg = {
+							onTapStart: function() {
+								Ext.Button.prototype.onTapStart.apply(this, arguments);
+								if(this.disabled) {
+									Ext.Msg.alert('', 'Невозможно перейти в данный статус');
+								}
+							}
+						}
 					;
 					
 					statusButtons =  [
-						{text: 'Черновик', itemId: 'draft', name: 'draft', canEnable: function(s) { return s == 'upload'; }},
-						{text: 'В работу', itemId: 'upload', name: 'upload', canEnable: function(s) { return s == 'draft'; } },
-						{text: 'Проверка', itemId: 'processing', name: 'processing'},
-						{text: 'На складе', itemId: 'done', name: 'done'}
+						{text: 'Черновик', itemId: 'draft', name: 'draft', canEnable: function(s) { return s == 'upload'; },
+							desc: 'Запись не будет отправлена на сервер. Измените статус на "В работу" для отправки.'},
+						{text: 'В работу', itemId: 'upload', name: 'upload', canEnable: function(s) { return s == 'draft'; },
+							desc: 'При следующей синхронизации запись попадет на сервер.'},
+						{text: 'Проверка', itemId: 'processing', name: 'processing',
+							desc: 'Запись обрабатывается на сервере. Данный статус не позволяет производить измененияв записи.'},
+						{text: 'На складе', itemId: 'done', name: 'done',
+							desc: ''}
 					];
-					
+
+					var btnPressed = undefined;
+
 					if (me.objectRecord) Ext.each (statusButtons, function(b) {
+
+						Ext.apply(b, btnCfg);
+
 						b.pressed = (b.name == state);
 						
 						b.disabled = true;
 						
 						if (b.canEnable) b.disabled = !b.canEnable(state);
 						
-						if (b.pressed) b.disabled = false;
+						if (b.pressed) {
+							b.disabled = false;
+							btnPressed = b;
+						}
 					});
 					
 					formItems.push({
@@ -121,17 +141,30 @@ var NavigatorView = Ext.extend(AbstractView, {
 						itemId: 'statusToolbar',
 						dock: 'top',
 						ui: 'none',
+						height: 100,
 						items:[
 							{	xtype: 'segmentedbutton',
 								itemId: cName,
 								items: statusButtons,
-								name: cName, cls: 'statuses'
+								name: cName, cls: 'statuses',
+								listeners: {
+									toggle: function (segBtn, btn, pressed) {
+										pressed && segBtn.up('toolbar').getComponent('statusDesc').update({desc: btn.desc});
+									}
+								}
+							},
+							{
+								xtype: 'panel',
+								itemId: 'statusDesc',
+								tpl: '<div class="statusDesc">{desc}</div>',
+								width: 500,
+								html: '<div class="statusDesc">' + btnPressed.desc + '</div>'
 							}
 						]
 					});
 				}
 			});
-		
+
 			this.cls = 'objectView';
 
 			formItems.push(createFieldSet(table.columns(), this.objectRecord.modelName, this));
