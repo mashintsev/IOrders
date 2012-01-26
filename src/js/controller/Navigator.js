@@ -39,10 +39,10 @@ Ext.regController('Navigator', {
 							console.log( 'Geolocation error at step ' + count + ': ' + error.message + ', code: ' + error.code );
 							
 							if( error.code === 1 )
-								Ext.Msg.alert('Функция геолокации выключена',
-									'iOrders работать не будет. <br/>'
+								Ext.Msg.alert('Геолокация запрещена',
+									'iOrders нормально работать не будет. <br/><br/>'
 										+ 'Зайдите в "Настройки"->"Основные"->"Сброс", нажмите "Сбросить предупр. размещения". '
-										+ '<br/> Затем, разрешите отслеживание местоположения.',
+										+ '<br/><br/> Затем, разрешите отслеживание местоположения.',
 									function(btn) {
 										count = 0;
 										Ext.defer( getLocation, 2000 );
