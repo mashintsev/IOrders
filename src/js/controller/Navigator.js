@@ -14,48 +14,55 @@ Ext.regController('Navigator', {
 			}
 		});
 
-		Ext.ModelMgr.getModel('Geolocation') && (function watchLocation(interval) {
-			var count = 0;
-			IOrders.geoWatch = window.setInterval(
-			function getLocation() {
-				count++;
-				if (count > 5) {
-					window.clearInterval(IOrders.geoWatch);
-					watchLocation();
-				} else {
-					navigator.geolocation.getCurrentPosition(
+		if (Ext.ModelMgr.getModel('Geolocation')) {
+			
+			var count = 0,
+				getLocation = function () {
+					if ( ++count > 6 )
+						IOrders.lastCoords && saveLocation();
+					else navigator.geolocation.getCurrentPosition (
 						function(l) {
-							if(l.coords.accuracy < 20) {
-                                if (!IOrders.lastCoords
-                                    || l.coords.latitude !== IOrders.lastCoords.coords.latitude
-                                    || l.coords.latitude !== IOrders.lastCoords.coords.latitude) {
-
-                                    Ext.ModelMgr.create(Ext.apply({}, IOrders.lastCoords = l), 'Geolocation').save();
-                                }
-							} else {
-
-								getLocation();
-                            }
+							
+							console.log ('Geolocation success at step ' + count + ': acc=' + l.coords.accuracy);
+							
+							IOrders.lastCoords = l.coords;
+							
+							if(l.coords.accuracy < 10)
+								saveLocation();
+							else
+								getLocation()
+							;
+							
 						},
 						function(error) {
-							console.log(error.message);
-
-							if(error.code === 1)
+							
+							console.log( 'Geolocation error at step ' + count + ': ' + error.message + ', code: ' + error.code );
+							
+							if( error.code === 1 )
 								Ext.Msg.alert('Функция геолокации выключена',
-									'Зайдите в "Настройки"->"Основные"->"Сброс", нажмите "Сбросить предупр. размещения". '
-                                        + 'В приложение разрешите отслеживание местоположения.',
+									'iOrders работать не будет. <br/>'
+										+ 'Зайдите в "Настройки"->"Основные"->"Сброс", нажмите "Сбросить предупр. размещения". '
+										+ '<br/> Затем, разрешите отслеживание местоположения.',
 									function(btn) {
-										getLocation();
+										count = 0;
+										Ext.defer( getLocation, 2000 );
 									}
 								);
+							else
+								getLocation();
 						},
-						{enableHighAccuracy: true, timeout: 10000}
+						{ enableHighAccuracy: true, timeout: 15000 }
 					);
+				},
+				saveLocation = function () {
+					Ext.ModelMgr.create( Ext.apply( {},  IOrders.lastCoords ), 'Geolocation' ).save();
 				}
-			},
-			1000 * 60 * 5
-			);
-		})();
+			;
+			
+			IOrders.geoWatch = window.setInterval( getLocation, 1000 * 60 * 2 );
+			getLocation()
+			
+		};
 	},
 
 	onUploadRecord: function(record) {
