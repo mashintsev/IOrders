@@ -1,6 +1,7 @@
 var ExpandableGroupedList = Ext.extend(Ext.List, {
 
 	grouped: true,
+    pinHeaders: true,
 
 	initComponent: function() {
 
@@ -24,7 +25,7 @@ var ExpandableGroupedList = Ext.extend(Ext.List, {
 		var headerEl = ExpandableGroupedList.superclass.onIndex.apply(this, arguments).down('.x-list-header'),
 			groupEl = this.getGroupEl(headerEl)
 		;
-		
+
 		var headerElArray = this.getExpandedElHeaders();
 		headerElArray.removeByKey(headerEl.id);
 		this.setGroupExpanded(headerElArray, false);

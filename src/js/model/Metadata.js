@@ -76,6 +76,9 @@ Ext.regModel('Table', {
 	},
 	getTitleColumns: function() {
 		return this.columns().queryBy(function(rec) {return rec.get('title') == true ? true : false;});
+	},
+	getParentColumns: function() {
+		return this.columns().queryBy(function(rec) {return rec.get('parent') ? true : false;});
 	}
 });
 

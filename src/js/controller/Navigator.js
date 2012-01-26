@@ -286,8 +286,16 @@ Ext.regController('Navigator', {
 
 		if(options.view.isObjectView) {
 
-			rec = Ext.ModelMgr.create(Ext.applyIf({serverPhantom: true, id: ''}, options.view.objectRecord.data), options.view.objectRecord.modelName);
-			
+            var tableRec = Ext.getStore('tables').getById(options.view.objectRecord.modelName),
+                parentColumns = tableRec.getParentColumns()
+            ;
+
+            rec = Ext.ModelMgr.create({}, options.view.objectRecord.modelName);
+
+            parentColumns.each(function(col) {
+                rec.set(col.get('name'), options.view.objectRecord.get(col.get('name')));
+            });
+
 		} else if(options.view.isSetView) {
 			rec = Ext.ModelMgr.create({}, options.view.tableRecord);
 			
@@ -299,8 +307,6 @@ Ext.regController('Navigator', {
 		
 		if (rec.modelName === 'SaleOrder' || rec.modelName === 'EncashmentRequest') {
 			rec.set('date', getNextWorkDay());
-			rec.set('processing', 'upload');
-			rec.set('totalCost', '');
 		}
 		
 		var oldCard = IOrders.viewport.getActiveItem();

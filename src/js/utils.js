@@ -366,20 +366,17 @@ var createFilterField = function(objectRecord) {
 function createDepsList(depsStore, tablesStore, view) {
 
 	view.depStore = new Ext.data.Store({
-		
 		model: 'Dep',
 		remoteFilter: false,
 		remoteSort: false,
 		data: getDepsData(depsStore, tablesStore, view),
-		
 		countFilter: new Ext.util.Filter({
 		    filterFn: function(item) {
 		        return item.get('count') > 0 || item.get('extendable');
 		    }
 		})
-		
 	});
-	
+
 	return view.depList = Ext.create({
 		xtype: 'list',
 		cls: 'x-deps-list',
