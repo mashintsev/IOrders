@@ -143,9 +143,15 @@ Ext.regController('Navigator', {
 	onBackButtonTap: function(options) {
 		
 		var view = options.view;
-			newCard = Ext.create(view.ownerViewConfig)
-		;
-		
+
+        var ownerViewConfig = view.ownerViewConfig;
+
+        while(!ownerViewConfig.isSetView && ownerViewConfig.ownerViewConfig) {
+            ownerViewConfig = ownerViewConfig.ownerViewConfig
+        }
+        
+        var newCard = Ext.create(ownerViewConfig);
+
 		if (newCard.isSetView) {
 			Ext.dispatch(Ext.apply(options, {action: 'loadSetViewStore', newCard: newCard, anim: IOrders.viewport.anims.back}));
 		} else {
