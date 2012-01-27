@@ -274,3 +274,9 @@ Ext.MessageBox.YESNO[1].text = 'Да';
 Ext.MessageBox.YESNO[0].text = 'Нет';
 Ext.Picker.prototype.doneButton = 'OK';
 Ext.Picker.prototype.cancelButton = 'Отмена';
+
+Ext.override(Ext.plugins.PullRefreshPlugin, {
+	pullRefreshText: 'Потяни вниз для обновления...',
+	releaseRefreshText: 'Отпусти для обновления...',
+	loadingText: 'Загрузка...'
+});

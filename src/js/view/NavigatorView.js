@@ -313,7 +313,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 						refreshFn: function(onCompleteCallback, pullPlugin) {
 							this.list.setLoading(true);
 							this.list.pullPlugin = pullPlugin;
-							IOrders.xi.fireEvent('pullrefresh', this.list.store.modelName, onCompleteCallback);
+							IOrders.xi.fireEvent('pullrefresh', this.list.store.model, onCompleteCallback);
 						}
 					})
 				],

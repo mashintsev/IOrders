@@ -35,6 +35,7 @@ Ext.regController('Navigator', {
                 pullPlugin.isLoading && pullPlugin.onLoadComplete.call(pullPlugin);
 
                 list.setLoading(false);
+                view.form.scroller.scrollTo({y: 0});
             }
 		});
 
