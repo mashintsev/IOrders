@@ -307,7 +307,16 @@ var NavigatorView = Ext.extend(AbstractView, {
 			formItems.push(Ext.apply({
 				xtype: 'list',
 				itemId: 'list',
-				plugins: new Ext.plugins.ListPagingPlugin({autoPaging: true}),
+				plugins: [
+					new Ext.plugins.ListPagingPlugin({autoPaging: true}),
+					new Ext.plugins.PullRefreshPlugin({
+						refreshFn: function(onCompleteCallback, pullPlugin) {
+							this.list.setLoading(true);
+							this.list.pullPlugin = pullPlugin;
+							IOrders.xi.fireEvent('pullrefresh', this.list.store.modelName, onCompleteCallback);
+						}
+					})
+				],
 				scroll: false,
 				cls: 'x-table-list',
 				grouped: listGroupedConfig.field ? true : false,

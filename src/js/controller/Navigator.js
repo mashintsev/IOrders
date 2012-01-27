@@ -3,7 +3,17 @@ Ext.regController('Navigator', {
 	afterAppLaunch: function(options) {
 		
 		this.mon(IOrders.xi, 'uploadrecord', this.onUploadRecord, this);
-		this.mon(IOrders.xi, 'tableload', this.onUploadTable, this);
+		this.mon(IOrders.xi, 'tableload', this.onTableLoad, this);
+        
+        this.mon(IOrders.xi, 'pullrefresh', function(modelName) {
+            IOrders.xi.request ({
+                command: 'download' ,
+                scope: IOrders.dbeng,
+                success: IOrders.dbeng.processDowloadData,
+                xi: IOrders.xi,
+                params: {filter: modelName}
+            });
+        }, this);
 		
 		IOrders.xi.on ('tableloadfull', function(t) {
 			var s = Ext.getStore (t);
@@ -12,6 +22,20 @@ Ext.regController('Navigator', {
 				s.currentPage = 1;
 				s.load();
 			}
+            
+            var view = IOrders.viewport.getActiveItem();
+            
+            if(view.isSetView && view.tableRecord === t) {
+                view.setViewStore.currentPage = 1;
+                view.setViewStore.load();
+
+                var list = view.form.getComponent('list'),
+                    pullPlugin = list.pullPlugin
+                ;
+                pullPlugin.isLoading && pullPlugin.onLoadComplete.call(pullPlugin);
+
+                list.setLoading(false);
+            }
 		});
 
 		if (Ext.ModelMgr.getModel('Geolocation')) {
@@ -117,7 +141,7 @@ Ext.regController('Navigator', {
 		}
 	},
 
-	onUploadTable: function(table) {
+	onTableLoad: function(table) {
 		
 		var view = IOrders.viewport.getActiveItem(),
 			tableStore = Ext.getStore('tables')
@@ -233,19 +257,30 @@ Ext.regController('Navigator', {
 	
 	onEditButtonTap: function(options) {
 		
-		var btn = options.btn;
-		btn.setText('Сохранить');
-		Ext.apply(btn, {name: 'Save'});
-		
-		options.view.depStore.each(function(rec) {
-			rec.set('editing', true);
-		});
-		
-		var toolbar = btn.up('toolbar');
-		toolbar.getComponent('Cancel').show();
-		
-		Ext.dispatch(Ext.apply(options, {action: 'setEditing', editing: true}));
+        if(!this.checkRecordInUpload(options.view.objectRecord.get('xid'))) {
+            var btn = options.btn;
+            btn.setText('Сохранить');
+            Ext.apply(btn, {name: 'Save'});
+            
+            options.view.depStore.each(function(rec) {
+                rec.set('editing', true);
+            });
+            
+            var toolbar = btn.up('toolbar');
+            toolbar.getComponent('Cancel').show();
+            
+            Ext.dispatch(Ext.apply(options, {action: 'setEditing', editing: true}));
+        } else {
+            Ext.Msg.alert('', 'Редактирование недоступно. Запись отправляется на сервер');
+        }
 	},
+    
+    checkRecordInUpload: function(xid) {
+        
+        var store = Ext.getStore('ToUpload');
+        
+        return store && store.findExact('id', xid) !== -1;
+    },
 	
 	onCancelButtonTap: function(options) {
 		
