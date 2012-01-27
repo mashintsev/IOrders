@@ -264,7 +264,10 @@ String.right = function (str, n){
 };
 
 Ext.override(Ext.data.Store, {
-	autoDestroy: true
+	autoDestroy: true,
+	destroy: function() {
+		this.destroyStore();
+	}
 });
 
 Ext.MessageBox.YESNO[1].text = 'Да';

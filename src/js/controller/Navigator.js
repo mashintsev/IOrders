@@ -290,14 +290,14 @@ Ext.regController('Navigator', {
                 parentColumns = tableRec.getParentColumns()
             ;
 
-            rec = Ext.ModelMgr.create({}, options.view.objectRecord.modelName);
+            rec = Ext.ModelMgr.create({serverPhantom: true}, options.view.objectRecord.modelName);
 
             parentColumns.each(function(col) {
                 rec.set(col.get('name'), options.view.objectRecord.get(col.get('name')));
             });
 
 		} else if(options.view.isSetView) {
-			rec = Ext.ModelMgr.create({}, options.view.tableRecord);
+			rec = Ext.ModelMgr.create({serverPhantom: true}, options.view.tableRecord);
 			
 			rec.set (
 				options.view.objectRecord.modelName.toLowerCase(),
