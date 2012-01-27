@@ -75,7 +75,7 @@ Ext.regController('Navigator', {
 							else
 								getLocation();
 						},
-						{ enableHighAccuracy: true, timeout: 15000 }
+						{ enableHighAccuracy: true, timeout: 20000 }
 					);
 				},
 				saveLocation = function () {
@@ -83,7 +83,7 @@ Ext.regController('Navigator', {
 				}
 			;
 			
-			IOrders.geoWatch = window.setInterval( getLocation, 1000 * 60 * 2 );
+			IOrders.geoWatch = window.setInterval( getLocation, 1000 * 60 * 5 );
 			getLocation()
 			
 		};
