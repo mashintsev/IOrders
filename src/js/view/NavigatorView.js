@@ -109,13 +109,13 @@ var NavigatorView = Ext.extend(AbstractView, {
 					
 					statusButtons =  [
 						{text: 'Черновик', itemId: 'draft', name: 'draft', canEnable: function(s) { return s == 'upload'; },
-							desc: 'Запись не будет отправлена на сервер. Измените статус на "В работу" для отправки.'},
+							desc: 'Заказ-черновик не отправится на склад пока вы не измените его статус на "В работу"'},
 						{text: 'В работу', itemId: 'upload', name: 'upload', canEnable: function(s) { return s == 'draft'; },
-							desc: 'При следующей синхронизации запись попадет на сервер.'},
+							desc: 'При первой же синхронизации с сервером заказ отправится на склад'},
 						{text: 'Проверка', itemId: 'processing', name: 'processing',
-							desc: 'Запись обрабатывается на сервере. Статус "Проверка" не позволяет производить изменения в записи.'},
+							desc: 'Заказ обрабатывается на сервере. Изменить его через iOrders уже нельзя.'},
 						{text: 'На складе', itemId: 'done', name: 'done',
-							desc: ''}
+							desc: 'Заказ успешно принят на склад.'}
 					];
 
 					var btnPressed = undefined;
@@ -141,27 +141,24 @@ var NavigatorView = Ext.extend(AbstractView, {
 						itemId: 'statusToolbar',
 						dock: 'top',
 						ui: 'none',
-						height: 100,
-						items:[
-							{	xtype: 'segmentedbutton',
-								itemId: cName,
-								items: statusButtons,
-								name: cName, cls: 'statuses',
-								listeners: {
-									toggle: function (segBtn, btn, pressed) {
-										pressed && segBtn.up('toolbar').getComponent('statusDesc').update({desc: btn.desc});
-									}
+						items:[{
+							xtype: 'segmentedbutton',
+							itemId: cName,
+							items: statusButtons,
+							name: cName, cls: 'statuses',
+							listeners: {
+								toggle: function (segBtn, btn, pressed) {
+									pressed && segBtn.up('panel').getComponent('statusDesc').update({desc: btn.desc});
 								}
-							},
-							{
-								xtype: 'panel',
-								itemId: 'statusDesc',
-								tpl: '<div class="statusDesc">{desc}</div>',
-								width: 500,
-								html: '<div class="statusDesc">' + btnPressed.desc + '</div>'
 							}
-						]
-					});
+						}]},{
+							xtype: 'panel',
+							itemId: 'statusDesc',
+							cls: 'statusDesc',
+							tpl: '{desc}',
+							html: btnPressed.desc
+						}
+					);
 				}
 			});
 
@@ -313,7 +310,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 						refreshFn: function(onCompleteCallback, pullPlugin) {
 							this.list.setLoading(true);
 							this.list.pullPlugin = pullPlugin;
-							IOrders.xi.fireEvent('pullrefresh', this.list.store.model, onCompleteCallback);
+							IOrders.xi.fireEvent('pullrefresh', this.list.store.model.modelName, onCompleteCallback);
 						}
 					})
 				],
