@@ -7,11 +7,16 @@ Ext.regController('Navigator', {
         
         this.mon(IOrders.xi, 'pullrefresh', function(modelName) {
             IOrders.xi.request ({
-                command: 'download' ,
-                scope: IOrders.dbeng,
-                success: IOrders.dbeng.processDowloadData,
-                xi: IOrders.xi,
-                params: {filter: modelName}
+				command: 'download',
+				scope: IOrders.dbeng,
+				success: function( r,o ) {
+					IOrders.dbeng.processDowloadData (r,o);
+					var data = Ext.DomQuery.select ( o.params.filter, r.responseXML );
+					if ( !data || data.length == 0 )
+						IOrders.xi.fireEvent ('tableloadfull', o.params.filter);
+				},
+				xi: IOrders.xi,
+				params: {filter: modelName}
             });
         }, this);
 		
