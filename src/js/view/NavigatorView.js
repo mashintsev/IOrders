@@ -304,16 +304,22 @@ var NavigatorView = Ext.extend(AbstractView, {
 			formItems.push(Ext.apply({
 				xtype: 'list',
 				itemId: 'list',
-				plugins: [
-					new Ext.plugins.ListPagingPlugin({autoPaging: true}),
-					new Ext.plugins.PullRefreshPlugin({
-						refreshFn: function(onCompleteCallback, pullPlugin) {
-							this.list.setLoading(true);
-							this.list.pullPlugin = pullPlugin;
-							IOrders.xi.fireEvent('pullrefresh', this.list.store.model.modelName, onCompleteCallback);
-						}
-					})
-				],
+				plugins: function () {
+					var res = [
+						new Ext.plugins.ListPagingPlugin({autoPaging: true})
+					];
+					
+					if (me.objectRecord.modelName == 'MainMenu')
+						res.push(new Ext.plugins.PullRefreshPlugin({
+							refreshFn: function(onCompleteCallback, pullPlugin) {
+								this.list.setLoading(true);
+								this.list.pullPlugin = pullPlugin;
+								IOrders.xi.fireEvent('pullrefresh', this.list.store.model.modelName, onCompleteCallback);
+							}
+						}));
+						
+					return res;
+				} (),
 				scroll: false,
 				cls: 'x-table-list',
 				grouped: listGroupedConfig.field ? true : false,
