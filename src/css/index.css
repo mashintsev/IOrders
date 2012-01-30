@@ -335,3 +335,10 @@
 	font-size: 0.7em;
 	font-weight: bold;
 }
+
+.loading .count {
+	background-image: url(loading.gif);
+	background-position: center;
+	background-size: 40px 25px;
+	background-repeat: no-repeat;
+}

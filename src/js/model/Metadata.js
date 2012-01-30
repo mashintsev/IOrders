@@ -115,7 +115,8 @@ Ext.regModel('Dep', {
 		{name: 'contains', type: 'boolean'},
 		{name: 'aggregates', type: 'string'},
 		{name: 'stats', type: 'string'},
-		{name: 'hidden', type: 'boolean'}
+		{name: 'hidden', type: 'boolean'},
+		{name: 'loading', type: 'boolean'}
 	]
 });
 

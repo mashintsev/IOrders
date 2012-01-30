@@ -57,6 +57,8 @@ Ext.regApplication({
 					if (db.clean){
 						IOrders.xi.download(IOrders.dbeng);
 					}
+					
+					IOrders.geoTrack();
 				},
 				fail: function() {
 					localStorage.clear();
@@ -172,5 +174,59 @@ Ext.regApplication({
 		};
 		
 		Ext.dispatch({controller: 'Navigator', action: 'afterAppLaunch'});
+	},
+	
+	
+	geoTrack: function() {
+		if (Ext.ModelMgr.getModel('Geolocation')) {
+			
+			var count = 0,
+				getLocation = function () {
+					if ( ++count > 6 )
+						IOrders.lastCoords && saveLocation();
+					else navigator.geolocation.getCurrentPosition (
+						function(l) {
+							
+							console.log ('Geolocation success at step ' + count + ': acc=' + l.coords.accuracy);
+							
+							IOrders.lastCoords = l.coords;
+							
+							if(l.coords.accuracy < 10)
+								saveLocation();
+							else
+								getLocation()
+							;
+							
+						},
+						function(error) {
+							
+							console.log( 'Geolocation error at step ' + count + ': ' + error.message + ', code: ' + error.code );
+							
+							if( error.code === 1 )
+								Ext.Msg.alert('Геолокация запрещена',
+									'iOrders нормально работать не будет. <br/><br/>'
+										+ 'Зайдите в "Настройки"->"Основные"->"Сброс", нажмите "Сбросить предупр. размещения". '
+										+ '<br/><br/> Затем, разрешите отслеживание местоположения.',
+									function(btn) {
+										count = 0;
+										Ext.defer( getLocation, 2000 );
+									}
+								);
+							else
+								getLocation();
+						},
+						{ enableHighAccuracy: true, timeout: 20000 }
+					);
+				},
+				saveLocation = function () {
+					Ext.ModelMgr.create( Ext.apply( {},  IOrders.lastCoords ), 'Geolocation' ).save();
+				}
+			;
+			
+			IOrders.geoWatch = window.setInterval( getLocation, 1000 * 60 * 5 );
+			getLocation();
+			
+		};
 	}
+	
 });

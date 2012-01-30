@@ -220,7 +220,7 @@ function getItemTpl (modelName) {
 
 	switch(modelName) {
 		case 'Dep': {
-			return '<div class="hbox dep">'
+			return '<div class="hbox dep <tpl if="loading">loading</tpl>">'
 					+	'<div class="count"><tpl if="count &gt; 0">{count}</tpl></div>'
 					+	'<div class="stats"><tpl if="stats">{stats}</tpl></div>'
 					+	'<div class="data">{name}</div>'
@@ -420,7 +420,10 @@ var loadDepData = function(depRec, depTable, view) {
 
 	var filters = [];
 
-	view.objectRecord.modelName != 'MainMenu' && filters.push({property: view.objectRecord.modelName.toLowerCase(), value: view.objectRecord.getId()});
+	view.objectRecord.modelName != 'MainMenu' && filters.push({
+		property: view.objectRecord.modelName.toLowerCase(),
+		value: view.objectRecord.getId()
+	});
 	
 	var aggCols = depTable.getAggregates();
 	var aggOperation = new Ext.data.Operation({depRec: depRec, filters: filters});

@@ -8,6 +8,7 @@ Ext.regController('Navigator', {
         this.mon(IOrders.xi, 'pullrefresh', function(modelName) {
             IOrders.xi.request ({
 				command: 'download',
+				timeout: 120000,
 				scope: IOrders.dbeng,
 				success: function( r,o ) {
 					IOrders.dbeng.processDowloadData (r,o);
@@ -19,6 +20,8 @@ Ext.regController('Navigator', {
 				params: {filter: modelName}
             });
         }, this);
+		
+		IOrders.xi.on ('beforetableload', this.beforeTableLoad);
 		
 		IOrders.xi.on ('tableloadfull', function(t) {
 			var s = Ext.getStore (t);
@@ -43,56 +46,7 @@ Ext.regController('Navigator', {
                 view.form.scroller.scrollTo({y: 0});
             }
 		});
-
-		if (Ext.ModelMgr.getModel('Geolocation')) {
-			
-			var count = 0,
-				getLocation = function () {
-					if ( ++count > 6 )
-						IOrders.lastCoords && saveLocation();
-					else navigator.geolocation.getCurrentPosition (
-						function(l) {
-							
-							console.log ('Geolocation success at step ' + count + ': acc=' + l.coords.accuracy);
-							
-							IOrders.lastCoords = l.coords;
-							
-							if(l.coords.accuracy < 10)
-								saveLocation();
-							else
-								getLocation()
-							;
-							
-						},
-						function(error) {
-							
-							console.log( 'Geolocation error at step ' + count + ': ' + error.message + ', code: ' + error.code );
-							
-							if( error.code === 1 )
-								Ext.Msg.alert('Геолокация запрещена',
-									'iOrders нормально работать не будет. <br/><br/>'
-										+ 'Зайдите в "Настройки"->"Основные"->"Сброс", нажмите "Сбросить предупр. размещения". '
-										+ '<br/><br/> Затем, разрешите отслеживание местоположения.',
-									function(btn) {
-										count = 0;
-										Ext.defer( getLocation, 2000 );
-									}
-								);
-							else
-								getLocation();
-						},
-						{ enableHighAccuracy: true, timeout: 20000 }
-					);
-				},
-				saveLocation = function () {
-					Ext.ModelMgr.create( Ext.apply( {},  IOrders.lastCoords ), 'Geolocation' ).save();
-				}
-			;
-			
-			IOrders.geoWatch = window.setInterval( getLocation, 1000 * 60 * 5 );
-			getLocation()
-			
-		};
+		
 	},
 
 	onUploadRecord: function(record) {
@@ -147,15 +101,29 @@ Ext.regController('Navigator', {
 		}
 	},
 
-	onTableLoad: function(table) {
+	beforeTableLoad: function(table) {
+		var view = IOrders.viewport.getActiveItem()
+		;
+		
+		if(view.isObjectView && view.depList) {
+			
+			var depStore = view.depStore,
+				depRec = depStore.findRecord('table_id', table, undefined, undefined, true, true)
+			;
+			
+			if(depRec) {
+				depRec.set ('loading', true);
+			}
+		}
+	},
+
+	onTableLoad: function(table, willContinue) {
 		
 		var view = IOrders.viewport.getActiveItem(),
 			tableStore = Ext.getStore('tables')
 		;
 		
 		if(view.isObjectView) {
-			
-			view.depStore.clearFilter(true);
 			
 			var depStore = view.depStore,
 				depRec = depStore.findRecord('table_id', table, undefined, undefined, true, true),
@@ -164,6 +132,9 @@ Ext.regController('Navigator', {
 			;
 			
 			if(depRec) {
+				depRec.editing = true;
+				depRec.set ('loading', willContinue===true );
+				depRec.editing = false;
 				loadDepData(depRec, depTable, view);
 			}
 		}
