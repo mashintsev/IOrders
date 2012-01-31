@@ -48,7 +48,23 @@ Ext.regController('Navigator', {
             }
 		});
 		
+        
+        IOrders.xi.on('beforeupload', this.onBeforeUpload, this);
 	},
+
+    onBeforeUpload: function(store) {
+        
+        var view = IOrders.viewport.getActiveItem();
+		
+		if(view.isXType('navigatorview')) {
+			
+			if(view.isObjectView) {
+                
+                if(store.findExact('id', view.objectRecord.get('xid')) !== -1)
+                    this.controlButtonsVisibilities(view, true);
+            }
+        }
+    },
 
 	onUploadRecord: function(record) {
 		
@@ -177,12 +193,16 @@ Ext.regController('Navigator', {
 			record = view.objectRecord
 		;
 
-		view.setLoading(true);
-		Ext.ModelMgr.getModel(record.modelName).prototype.getProxy().destroy(new Ext.data.Operation({id: record.getId(), records: [record]}), function(operation) {
-
-			view.setLoading(false);
-			Ext.dispatch(Ext.apply(options, {action: 'goBack'}));
-		});
+        if(!this.checkRecordInUpload(record.get('xid'))) {
+            view.setLoading(true);
+            Ext.ModelMgr.getModel(record.modelName).prototype.getProxy().destroy(new Ext.data.Operation({id: record.getId(), records: [record]}), function(operation) {
+    
+                view.setLoading(false);
+                Ext.dispatch(Ext.apply(options, {action: 'goBack'}));
+            });
+        } else {
+            Ext.Msg.alert('', 'Нельзя удалить. Запись отправляется на сервер');
+        }
 	},
 
 	onSaveButtonTap: function(options) {
