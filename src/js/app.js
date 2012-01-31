@@ -224,7 +224,7 @@ Ext.regApplication({
 			;
 			
 			IOrders.geoWatch = window.setInterval( getLocation, 1000 * 60 * 5 );
-			getLocation();
+			Ext.defer( getLocation, 15000 );
 			
 		};
 	}
