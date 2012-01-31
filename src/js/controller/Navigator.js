@@ -6,20 +6,21 @@ Ext.regController('Navigator', {
 		this.mon(IOrders.xi, 'tableload', this.onTableLoad, this);
         
         this.mon(IOrders.xi, 'pullrefresh', function(modelName) {
-			IOrders.xi.fireEvent ('beforetableload', modelName);
-            IOrders.xi.request ({
-				command: 'download',
-				timeout: 120000,
-				scope: IOrders.dbeng,
-				success: function( r,o ) {
-					IOrders.dbeng.processDowloadData (r,o);
-					var data = Ext.DomQuery.select ( o.params.filter, r.responseXML );
-					if ( !data || data.length == 0 )
-						IOrders.xi.fireEvent ('tableloadfull', o.params.filter);
-				},
-				xi: IOrders.xi,
-				params: {filter: modelName}
-            });
+			if(IOrders.xi.fireEvent ('beforetableload', modelName) !== false) {
+                IOrders.xi.request ({
+                    command: 'download',
+                    timeout: 120000,
+                    scope: IOrders.dbeng,
+                    success: function( r,o ) {
+                        IOrders.dbeng.processDowloadData (r,o);
+                        var data = Ext.DomQuery.select ( o.params.filter, r.responseXML );
+                        if ( !data || data.length == 0 )
+                            IOrders.xi.fireEvent ('tableloadfull', o.params.filter);
+                    },
+                    xi: IOrders.xi,
+                    params: {filter: modelName}
+                });
+            }
         }, this);
 		
 		IOrders.xi.on ('beforetableload', this.beforeTableLoad);
@@ -119,19 +120,26 @@ Ext.regController('Navigator', {
 	},
 
 	beforeTableLoad: function(table) {
-		var view = IOrders.viewport.getActiveItem()
+		var view = IOrders.viewport.getActiveItem(),
+            tableRec = Ext.getStore('tables').getById(table)
 		;
 		
-		if(view.isObjectView && view.depList) {
-			
-			var depStore = view.depStore,
-				depRec = depStore.findRecord('id', table, undefined, undefined, true, true)
-			;
-			
-			if(depRec) {
-				depRec.set ('loading', true);
-			}
-		}
+        if(!tableRec.get('loading')) {
+            if(view.isObjectView && view.depList) {
+                
+                var depStore = view.depStore,
+                    depRec = depStore.findRecord('id', table, undefined, undefined, true, true)
+                ;
+                
+                if(depRec) {
+                    depRec.set ('loading', true);
+                }
+            }
+            
+            tableRec.set('loading', true);
+        } else {
+            return false;
+        }
 	},
 
 	onTableLoad: function(table, willContinue) {
@@ -156,6 +164,7 @@ Ext.regController('Navigator', {
 			}
 		}
 		
+        Ext.getStore('tables').getById(table).set ('loading', willContinue === true);
 	},
 
 	onBackButtonTap: function(options) {
