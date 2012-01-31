@@ -489,7 +489,7 @@ var loadDepData = function(depRec, depTable, view, config) {
 			modelProxy.aggregate(countOperation, function(operation) {
 				
 				var aggResults = operation.resultSet.records[0].data;
-				if (aggResults.cnt > 0) operation.depRec.set('stats', aggResults.cnt);
+				operation.depRec.set('stats', aggResults.cnt);
 				
 				if(isSetView) {
 					
