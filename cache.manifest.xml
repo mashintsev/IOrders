@@ -5,6 +5,7 @@
         <file>index.html</file>
         
         <file>src/css/index.css</file>
+        <file>src/css/loading.gif</file>
         <file>src/css/apple-touch-icon.png</file>
         
         <file>src/js/controller/Main.js</file>
