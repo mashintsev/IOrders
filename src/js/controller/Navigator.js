@@ -109,7 +109,7 @@ Ext.regController('Navigator', {
 		if(view.isObjectView && view.depList) {
 			
 			var depStore = view.depStore,
-				depRec = depStore.findRecord('table_id', table, undefined, undefined, true, true)
+				depRec = depStore.findRecord('id', table, undefined, undefined, true, true)
 			;
 			
 			if(depRec) {
@@ -127,7 +127,7 @@ Ext.regController('Navigator', {
 		if(view.isObjectView) {
 			
 			var depStore = view.depStore,
-				depRec = depStore.findRecord('table_id', table, undefined, undefined, true, true),
+				depRec = depStore.findRecord('id', table, undefined, undefined, true, true),
 				depTable = tableStore.getById(table),
 				objectTable = tableStore.getById(view.objectRecord.modelName)
 			;
@@ -362,7 +362,7 @@ Ext.regController('Navigator', {
 				
 				var createdRecordModelName = isTableList
 						? target.up('.dep').down('input').dom.value
-						: list.getRecord(item).get('table_id'),
+						: list.getRecord(item).get('id'),
 					objectRecord = isTableList
 						? (list.modelForDeps && !Ext.getStore('tables').getById(tappedRec.modelName).hasIdColumn()
 								? Ext.getStore(list.modelForDeps).getById(tappedRec.get(list.modelForDeps.toLowerCase())) 
@@ -469,7 +469,7 @@ Ext.regController('Navigator', {
 								controller: 'Navigator',
 								action: 'createAndActivateView',
 								record: record,
-								tableRecord: depStore.getAt(0).get('table_id'),
+								tableRecord: depStore.getAt(0).get('id'),
 								isSetView: true,
 								editing: false
 							}));
@@ -480,7 +480,7 @@ Ext.regController('Navigator', {
 						controller: 'Navigator',
 						action: 'createAndActivateView',
 						record: tappedRec,
-						tableRecord: depStore.getAt(0).get('table_id'),
+						tableRecord: depStore.getAt(0).get('id'),
 						isSetView: true,
 						editing: false
 					}));
@@ -968,100 +968,16 @@ Ext.regController('Navigator', {
 		Ext.each(options.selections, function(record) {
 			if(!record.data.deps) {
 				if(!depStore || !tableRecord) {
-					tableRecord = tableStore.getById(record.modelName);
-					hasIdColumn = tableRecord.hasIdColumn();
-					tableRecord = !hasIdColumn && list.modelForDeps ? tableStore.getById(list.modelForDeps) : tableRecord; 
-					depStore = tableRecord.deps();
+					var tableRecord = tableStore.getById(record.modelName),
+    					hasIdColumn = tableRecord.hasIdColumn(),
+    					tableRecord = !hasIdColumn && list.modelForDeps ? tableStore.getById(list.modelForDeps) : tableRecord,
+    					depStore = tableRecord.deps()
+                    ;
 				}
 				
-				var data = [];
-				
-				depStore.each(function(dep) {
-					
-					var depTable = tableStore.getById(dep.get('table_id'));
-					
-					if(depTable.get('nameSet') && (depTable.get('id') != 'SaleOrderPosition' || record.modelName == 'SaleOrder') && record.modelName !== depTable.get('id')) {
-						
-						var depRec = {
-								name: depTable.get('nameSet'),
-								table_id: depTable.get('id'),
-								extendable: depTable.get('extendable'),
-								contains: dep.get('contains'),
-								editing: false
-							},
-							modelProxy = Ext.ModelMgr.getModel(depTable.get('id')).prototype.getProxy(),
-							filters = []
-						;
-
-						recordForDeps = list.modelForDeps && !hasIdColumn 
-								? Ext.getStore(list.modelForDeps).getById(record.get(list.modelForDeps[0].toLowerCase() + list.modelForDeps.substring(1))) 
-								: record;
-
-						recordForDeps.modelName != 'MainMenu'
-							&& filters.push({
-								property: recordForDeps.modelName.toLowerCase(),
-								value: recordForDeps.getId()
-							})
-						;	
-
-						if(depTable.hasAggregates()) {
-						
-							var aggCols = depTable.getAggregates();
-							var aggOperation = new Ext.data.Operation({filters: filters});
-
-							modelProxy.aggregate(aggOperation, function(operation) {
-
-								var aggDepResult = '';
-								var aggDepTpl = new Ext.XTemplate('<tpl if="value &gt; 0"><tpl if="name">{name} : </tpl>{[values.value.toFixed(2)]} </tpl>');
-								var aggResults = operation.resultSet.records[0].data;
-
-								aggCols.each(function(aggCol) {
-									aggDepResult += aggDepTpl.apply({name: aggCol.get('label') != depTable.get('nameSet') ? aggCol.get('label') : '', value: aggResults[aggCol.get('name')]});
-								});
-
-								depRec.aggregates = aggDepResult;
-								depRec.count = aggResults.cnt;
-
-								record.data.deps = data;
-								list.store && list.refreshNode(list.indexOf(record));
-								
-								list.doComponentLayout();
-							});
-						} else {
-							var operCount = new Ext.data.Operation ({
-								filters: filters
-							});
-							
-							modelProxy.count(operCount, function(operation) {
-								depRec.count = operation.result;
-								record.data.deps = data;
-								list.store && list.refreshNode(list.indexOf(record));
-								
-								list.doComponentLayout();
-							});
-						}
-						
-						var t = depStore.getById(depRec.table_id);
-						
-						if(t && t.columns && t.columns().findBy(function(c){return c.get('name')=='processing'}) > 0) {
-							
-							filters.push({property: 'processing', value: 'draft'});
-							
-							var countOperation = new Ext.data.Operation({depRec: depRec, filters: filters});
-							modelProxy.aggregate(countOperation, function(operation) {
-								
-								var aggResults = operation.resultSet.records[0].data;
-								
-								if (aggResults.cnt > 0) operation.depRec.stats =  aggResults.cnt;
-								
-								record.data.deps = data;
-								list.store && list.refreshNode(list.indexOf(record));
-							});
-						}
-
-						data.push(depRec);
-					}
-				});
+				getDepsData(depStore, tableStore, undefined,
+                    {list: list, record: record, tableRecord: tableRecord, hasIdColumn: hasIdColumn}
+                );
 			}
 		});
 	},

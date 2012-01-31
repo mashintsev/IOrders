@@ -72,7 +72,7 @@ Ext.regController('Main', {
 		;
 		
 		if(navView) {
-			switch(rec.get('table_id')) {
+			switch(rec.get('id')) {
 				case 'SaleOrderPosition' : {
 					
 					var target = Ext.get(options.event.target);
