@@ -220,10 +220,10 @@ Ext.regApplication({
 				},
 				saveLocation = function () {
 					Ext.ModelMgr.create( Ext.apply( {},  IOrders.lastCoords ), 'Geolocation' ).save();
+					IOrders.geoWatch = window.setTimeout( getLocation, 1000 * 60 * 5 );
 				}
 			;
 			
-			IOrders.geoWatch = window.setInterval( getLocation, 1000 * 60 * 5 );
 			Ext.defer( getLocation, 15000 );
 			
 		};

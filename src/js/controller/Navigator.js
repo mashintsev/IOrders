@@ -6,6 +6,7 @@ Ext.regController('Navigator', {
 		this.mon(IOrders.xi, 'tableload', this.onTableLoad, this);
         
         this.mon(IOrders.xi, 'pullrefresh', function(modelName) {
+			IOrders.xi.fireEvent ('beforetableload', modelName);
             IOrders.xi.request ({
 				command: 'download',
 				timeout: 120000,

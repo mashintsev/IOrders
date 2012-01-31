@@ -339,6 +339,6 @@
 .loading .count {
 	background-image: url(loading.gif);
 	background-position: center;
-	background-size: 40px 25px;
+	background-size: 40px 26px;
 	background-repeat: no-repeat;
 }
