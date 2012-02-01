@@ -33,7 +33,10 @@ Ext.regController('Navigator', {
 				s.load();
 			}
             
-            var view = IOrders.viewport.getActiveItem();
+            var view = IOrders.viewport.getActiveItem(),
+                tableStore = Ext.getStore('tables')
+            ;
+            tableStore.getById(t).set('loading', false);
             
             if(view.isSetView && view.tableRecord === t) {
                 view.setViewStore.currentPage = 1;
@@ -46,7 +49,19 @@ Ext.regController('Navigator', {
 
                 list.setLoading(false);
                 view.form.scroller.scrollTo({y: 0});
+            } else if(view.isObjectView) {
+                var depStore = view.depStore,
+                    depRec = depStore.findRecord('id', t, undefined, undefined, true, true),
+                    depTable = tableStore.getById(t),
+                    objectTable = tableStore.getById(view.objectRecord.modelName)
+                ;
+                
+                if(depRec) {
+                    depRec.set('loading', true);
+                    loadDepData(depRec, depTable, view, undefined, true);
+                }
             }
+            
 		});
 		
         
@@ -157,14 +172,9 @@ Ext.regController('Navigator', {
 			;
 			
 			if(depRec) {
-				depRec.editing = true;
-				depRec.set ('loading', willContinue===true );
-				depRec.editing = false;
 				loadDepData(depRec, depTable, view, undefined, true);
 			}
 		}
-		
-        Ext.getStore('tables').getById(table).set ('loading', willContinue === true);
 	},
 
 	onBackButtonTap: function(options) {
