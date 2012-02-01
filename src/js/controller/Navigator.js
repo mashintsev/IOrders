@@ -57,7 +57,7 @@ Ext.regController('Navigator', {
                 ;
                 
                 if(depRec) {
-                    depRec.set('loading', true);
+                    depRec.set('loading', false);
                     loadDepData(depRec, depTable, view, undefined, true);
                 }
             }
@@ -172,6 +172,7 @@ Ext.regController('Navigator', {
 			;
 			
 			if(depRec) {
+                depRec.set('loading', willContinue === true);
 				loadDepData(depRec, depTable, view, undefined, true);
 			}
 		}
