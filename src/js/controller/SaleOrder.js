@@ -126,7 +126,7 @@ Ext.regController('SaleOrder', {
 						
 						newCard.productStore = createStore('Offer', {
 							remoteFilter: true,
-							remoteSort: true,
+							remoteSort: false,
 							groupField: 'firstName',
 							getGroupString: function(rec) {
 								return rec.get(this.groupField).replace(/ /g, '_');
