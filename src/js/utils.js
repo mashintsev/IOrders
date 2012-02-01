@@ -222,7 +222,7 @@ function getItemTpl (modelName) {
 		case 'Dep': {
 			return '<div class="hbox dep <tpl if="loading">loading</tpl>">'
 					+	'<div class="count"><tpl if="count &gt; 0">{count}</tpl></div>'
-					+	'<div class="stats"><tpl if="stats">{stats}</tpl></div>'
+					+	'<div class="stats"><tpl if="stats &gt; 0">{stats}</tpl></div>'
 					+	'<div class="data">{nameSet}</div>'
 					+	'<div class="aggregates">{aggregates}</div>'
 					+	'<tpl if="extendable && (!editing && !contains || editing && contains)"><div class="x-button extend add">+</div></tpl>'
@@ -421,7 +421,7 @@ var getDepsData = function(depsStore, tablesStore, view, config) {
 	return data;
 };
 
-var loadDepData = function(depRec, depTable, view, config) {
+var loadDepData = function(depRec, depTable, view, config, force) {
 
 	var modelProxy = Ext.ModelMgr.getModel(depTable.get('id')).prototype.getProxy(),
 		filters = [],
@@ -449,7 +449,7 @@ var loadDepData = function(depRec, depTable, view, config) {
 		}
 	}
 
-	if(!depRec.get('count') || depRec.get('filtered') || depRec.get('expandable')) {
+	if(!depRec.get('count') || depRec.get('filtered') || depRec.get('expandable') || force) {
 
 		var aggCols = depTable.getAggregates();
 		var aggOperation = new Ext.data.Operation({depRec: depRec, filters: filters});

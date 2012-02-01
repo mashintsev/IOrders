@@ -160,7 +160,7 @@ Ext.regController('Navigator', {
 				depRec.editing = true;
 				depRec.set ('loading', willContinue===true );
 				depRec.editing = false;
-				loadDepData(depRec, depTable, view);
+				loadDepData(depRec, depTable, view, undefined, true);
 			}
 		}
 		
