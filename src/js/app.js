@@ -53,12 +53,8 @@ Ext.regApplication({
 					
 					tStore.getProxy().data = this.metadata;
 					tStore.load(function() {IOrders.init();});
-					
-					if (db.clean){
-						IOrders.xi.download(IOrders.dbeng);
-					}
-					
 					IOrders.geoTrack();
+					
 				},
 				fail: function() {
 					localStorage.clear();
@@ -127,9 +123,12 @@ Ext.regApplication({
 			
 			if (!this.xi.noServer){
 				var r = function(db) {
-					if (!db.clean) {
-						IOrders.xi.login ({
-							success: function() {
+					IOrders.xi.login ({
+						success: function() {
+							if (db.clean || localStorage.getItem('needSync') == 'true'){
+								localStorage.removeItem('needSync');
+								IOrders.xi.download(IOrders.dbeng);
+							} else {
 								p = new Ext.data.SQLiteProxy({engine: IOrders.dbeng, model: 'ToUpload'});
 								
 								p.count(new Ext.data.Operation(),
@@ -141,8 +140,8 @@ Ext.regApplication({
 									}
 								);
 							}
-						});
-					}
+						}
+					});
 				}, f = function() {
 					IOrders.xi.reconnect({
 						success: function() {

@@ -319,7 +319,10 @@ Ext.regController('Main', {
 				IOrders.dbeng.clearListeners();
 				
 				IOrders.viewport.setLoading({msg: 'Все стираю ...'});
-				IOrders.dbeng.on ('dbstart', function() {location.reload()});
+				IOrders.dbeng.on ('dbstart', function() {
+					localStorage.setItem ('needSync', true);
+					location.reload();
+				});
 				
 				IOrders.dbeng.startDatabase (
 					Ext.decode(localStorage.getItem('metadata')),
