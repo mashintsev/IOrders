@@ -78,7 +78,7 @@ var getItemTplMeta = function(modelName, config) {
 				+ 		'<input type="hidden" value="{id}" />'
 				+ 		'<div class="count"><tpl if="count &gt; 0">{count}</tpl></div>'
 				+ 		'<div class="stats"><tpl if="stats &gt; 0">{stats}</tpl></div>'
-				+ 		'<div class="data">{name}</div>'
+				+ 		'<div class="data">{nameSet}</div>'
 				+ 		'<div class="aggregates">{aggregates}</div>'
 				+ 		'<tpl if="extendable && (!editing && !contains || editing && contains)"><div class="x-button extend add">+</div></tpl>'
 				+ 	'</div>'
