@@ -89,7 +89,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 		this.fbBtn = Ext.create({xtype: 'button', name: 'FacebookFeed', text: 'Новости', scope: this});
 		this.dockedItems[0].items.push(this.fbBtn);
 
-		if(this.isObjectView) {
+		if(true) {
 			
 			table.columns().each( function (c) {
 				var cName = c.get('name');
@@ -226,7 +226,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 			if (!this.editable || this.objectRecord.modelName == 'SaleOrder')
 				formItems.push(createDepsList(table.deps(), tablesStore, this));
 
-			if(IOrders.newDesign && table.hasNameColumn()) {
+			if(table.hasNameColumn()) {
 
 				var store = createStore(this.objectRecord.modelName, getSortersConfig(this.objectRecord.modelName, getSortersConfig(this.objectRecord.modelName, {})));
 
@@ -288,7 +288,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 				}));
 			}
 
-		} else if (this.isSetView) {
+		} else if (false) {
 			
 			this.cls = 'setView';
 			this.dockedItems[0].title = tablesStore.getById(this.tableRecord).get('nameSet');
