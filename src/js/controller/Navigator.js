@@ -509,7 +509,7 @@ Ext.regController('Navigator', {
 								controller: 'Navigator',
 								action: 'createAndActivateView',
 								record: record,
-								tableRecord: depStore.getAt(0).get('id'),
+								tableRecord: depStore.getAt(0).get('table_id'),
 								isSetView: true,
 								editing: false
 							}));
@@ -520,7 +520,7 @@ Ext.regController('Navigator', {
 						controller: 'Navigator',
 						action: 'createAndActivateView',
 						record: tappedRec,
-						tableRecord: depStore.getAt(0).get('id'),
+						tableRecord: depStore.getAt(0).get('table_id'),
 						isSetView: true,
 						editing: false
 					}));
