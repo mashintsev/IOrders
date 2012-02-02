@@ -353,6 +353,20 @@ var NavigatorView = Ext.extend(AbstractView, {
 		);
 	},
 	
+	changeViewMode: function(mode) {
+
+		switch(mode) {
+			case 'ObjectView' : {
+				
+				break;
+			}
+			case 'SetView' : {
+				
+				break;
+			}
+		}
+	},
+	
 	/**
 	 * Overridden
 	 */
