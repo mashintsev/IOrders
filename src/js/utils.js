@@ -77,7 +77,7 @@ var getItemTplMeta = function(modelName, config) {
 				+	'<div class="hbox dep">'
 				+ 		'<input type="hidden" value="{id}" />'
 				+ 		'<div class="count"><tpl if="count &gt; 0">{count}</tpl></div>'
-				+ 		'<div class="stats"><tpl if="stats">{stats}</tpl></div>'
+				+ 		'<div class="stats"><tpl if="stats &gt; 0">{stats}</tpl></div>'
 				+ 		'<div class="data">{name}</div>'
 				+ 		'<div class="aggregates">{aggregates}</div>'
 				+ 		'<tpl if="extendable && (!editing && !contains || editing && contains)"><div class="x-button extend add">+</div></tpl>'
@@ -222,7 +222,7 @@ function getItemTpl (modelName) {
 		case 'Dep': {
 			return '<div class="hbox dep <tpl if="loading">loading</tpl>">'
 					+	'<div class="count"><tpl if="count &gt; 0">{count}</tpl></div>'
-					+	'<div class="stats"><tpl if="stats &gt; 0">{stats}</tpl></div>'
+					+	'<div class="stats"><tpl if="stats != \'0\'">{stats}</tpl></div>'
 					+	'<div class="data">{nameSet}</div>'
 					+	'<div class="aggregates">{aggregates}</div>'
 					+	'<tpl if="extendable && (!editing && !contains || editing && contains)"><div class="x-button extend add">+</div></tpl>'
