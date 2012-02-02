@@ -685,3 +685,10 @@ var unavailBtnFuncMessage = function(btn, view) {
 		}
 	}
 };
+
+var checkRecordInUpload = function(xid) {
+
+	var store = Ext.getStore('ToUpload');
+	
+	return store && store.findExact('id', xid) !== -1;
+};

@@ -278,5 +278,13 @@ Ext.Picker.prototype.cancelButton = 'Отмена';
 Ext.override(Ext.plugins.PullRefreshPlugin, {
 	pullRefreshText: 'Потяни вниз для обновления...',
 	releaseRefreshText: 'Отпусти для обновления...',
-	loadingText: 'Загрузка...'
+	loadingText: 'Загрузка...',
+	
+	onBeforeLoad : function() {
+		if (this.isLoading && this.list.store.getCount() > 0) {
+			this.list.setLoading(false)
+			return false;
+		}
+		return true;
+	}
 });

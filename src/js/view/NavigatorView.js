@@ -100,9 +100,13 @@ var NavigatorView = Ext.extend(AbstractView, {
 						btnCfg = {
 							onTapStart: function() {
 								
-								Ext.Button.prototype.onTapStart.apply(this, arguments);
-								if(this.disabled) {
-									Ext.Msg.alert('', 'Невозможно перейти в статус ' + this.text);
+								if(!checkRecordInUpload(me.objectRecord.get('xid'))) {
+									Ext.Button.prototype.onTapStart.apply(this, arguments);
+									if(this.disabled) {
+										Ext.Msg.alert('', 'Невозможно перейти в статус ' + this.text);
+									}
+								} else {
+									Ext.Msg.alert('', 'Нельзя изменить статус. Запись отправляется на сервер');
 								}
 							}
 						}
