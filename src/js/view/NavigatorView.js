@@ -99,6 +99,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 						state = me.objectRecord.get(cName) || 'draft',
 						btnCfg = {
 							onTapStart: function() {
+								
 								Ext.Button.prototype.onTapStart.apply(this, arguments);
 								if(this.disabled) {
 									Ext.Msg.alert('', 'Невозможно перейти в статус ' + this.text);

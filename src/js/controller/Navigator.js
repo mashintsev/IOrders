@@ -78,6 +78,15 @@ Ext.regController('Navigator', {
                 
                 if(store.findExact('id', view.objectRecord.get('xid')) !== -1)
                     this.controlButtonsVisibilities(view, true);
+                    
+                    var statusBar = view.form.getComponent('statusToolbar');
+                    
+                    if(statusBar) {
+						
+						var segBtn = statusBar.getComponent('processing')
+                        
+                        segBtn.disable();
+                    }
             }
         }
     },
@@ -106,6 +115,8 @@ Ext.regController('Navigator', {
 						var segBtn = statusBar.getComponent('processing'),
 							state = record.get('processing');
 						;
+                        
+                        segBtn.enable()
 						
 						segBtn.getComponent(state).enable();
 						segBtn.setPressed(state, true, true);
