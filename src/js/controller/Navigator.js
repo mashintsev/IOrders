@@ -257,8 +257,9 @@ Ext.regController('Navigator', {
 				rec.fields.getByKey('processing') && this.controlButtonsVisibilities(view, rec.get('processing') != 'draft' && !rec.get('serverPhantom'));
 			}
             
-            if(rec.modelName === 'SaleOrder' && rec.get('processing') === 'draft') {
+            if(rec.modelName === 'SaleOrder' && !rec.phantom && rec.get('processing') === 'draft') {
                 rec.set('processing', 'upload');
+                form.loadRecord(rec);
                 
                 var statusBar = form.getComponent('statusToolbar');
 					

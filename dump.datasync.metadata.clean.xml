@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<metadata xmlns="http://unact.net/xml/xi" name="iorders" version="1.741" expect-megabytes="15">
+<metadata xmlns="http://unact.net/xml/xi" name="iorders" version="1.742" expect-megabytes="15">
   <tables set-of="table">
     <table id="Uncashment" name="Сданная выручка" nameSet="Сданная выручка" level="0" extendable="true">
       <columns set-of="column">
@@ -199,7 +199,7 @@
         <column id="SaleOrderid" name="id" type="string" key="true"/>
         <column id="SaleOrderxid" name="xid"/>
         <column id="SaleOrderdeviceCts" name="deviceCts" type="datetime" editable="new-only"/>
-        <column id="SaleOrderprocessing" name="processing" type="string" label="Статус" editable="status" init="upload"/>
+        <column id="SaleOrderprocessing" name="processing" type="string" label="Статус" editable="status" init="draft"/>
         <column id="SaleOrderisBonus" name="isBonus" type="boolean" label="Бонусный" editable="true"/>
         <column id="SaleOrderincassNeeded" name="incassNeeded" type="boolean" label="Требуется инкассация" editable="true"/>
         <column id="SaleOrderisWhite" name="isWhite" type="boolean" label="Нужен счет-фактура" editable="true"/>

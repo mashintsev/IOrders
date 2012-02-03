@@ -16,7 +16,9 @@ Ext.regController('SaleOrder', {
 	},
 
 	onSaveButtonTap: function(options) {
-		
+
+		options.view.saleOrder.get('processing') === 'draft' && options.view.saleOrder.set('processing', 'upload');
+
 		Ext.dispatch(Ext.apply(options, {
 			action: 'saveOffer'
 		}));
@@ -56,8 +58,7 @@ Ext.regController('SaleOrder', {
 
 		var tc = saleOrderPosStore.sum('cost').toFixed(2);
 
-		view.saleOrder.set ('totalCost', tc);		
-		view.saleOrder.get('processing') === 'draft' && view.saleOrder.set('processing', 'upload');
+		view.saleOrder.set ('totalCost', tc);
 
 		saleOrderPosStore.sync();
 
