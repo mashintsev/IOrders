@@ -8,7 +8,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 	 */
 	
 	createItems: function() {
-		
+/*		
 		var tablesStore = Ext.getStore('tables'),
 		    table = tablesStore.getById(this.objectRecord.modelName),
 		    formItems = [],
@@ -145,70 +145,9 @@ var NavigatorView = Ext.extend(AbstractView, {
 				});
 				
 			}
-			
-			if (!this.editable || this.objectRecord.modelName == 'SaleOrder')
-				formItems.push(createDepsList(table.deps(), tablesStore, this));
-
 			if(table.hasNameColumn()) {
 
-				var store = createStore(this.objectRecord.modelName, getSortersConfig(this.objectRecord.modelName, getSortersConfig(this.objectRecord.modelName, {})));
-
-				var limit = 0, curPage = 1;
-				if(me.ownerViewConfig.tableRecord.modelName === me.objectRecord.modelName) {
-
-					limit = me.ownerViewConfig.storeLimit;
-					curPage = me.ownerViewConfig.storePage;
-				}
-				store.load({limit:  limit});
-				store.currentPage = curPage;
-
-				this.items.push(me.objectList = Ext.create ({
-					
-					xtype: 'list',
-					cls: 'sidefilter',
-					flex: 1,
-					plugins: limit !== 0 ? new Ext.plugins.ListPagingPlugin({autoPaging: true}) : undefined, 
-					itemTpl: getItemTplMeta(this.objectRecord.modelName, {useDeps: false, onlyKey: true}).itemTpl,
-					store: store,
-					
-					initComponent: function() {
-						var scroll = this.scroll;
-						Ext.List.prototype.initComponent.apply(this, arguments);
-						if (typeof scroll == 'object')
-							this.scroll = scroll;
-					},
-					
-					listeners: {
-						
-						scope: this,
-						
-						refresh: function(list) {
-							if(list.store.getCount() > 1) {
-								
-								var idx = list.store.findExact('id', this.objectRecord.getId());
-								
-								list.selModel.select(idx);
-								
-								item = Ext.fly(list.getNode(idx));
-								item && list.scroller.setOffset({
-									y: -item.getOffsetsTo(list.scrollEl)[1]
-								});
-							}
-						},
-						
-						selectionchange: function(selModel, recs) {
-							
-							if(recs.length) {
-								Ext.dispatch ({
-									controller: 'Navigator',
-									action: 'onObjectListItemSelect',
-									selected: recs[0],
-									view: me
-								})
-							}
-						}
-					}
-				}));
+				
 			}
 
 		} else if (false) {
@@ -265,26 +204,20 @@ var NavigatorView = Ext.extend(AbstractView, {
 			});
 		}
 		
-		this.mon (this, 'activate', this.syncButton.rebadge);
-		
-		this.items.push(this.form = new Ext.form.FormPanel(Ext.apply({
-				flex: 2,
-				cls: 'x-navigator-form ' + this.cls,
-				scroll: true,
-				items: formItems
-			}, formConfig))
-		);
+		this.mon (this, 'activate', this.syncButton.rebadge);*/
 	},
 	
 	changeViewMode: function(mode) {
 
 		switch(mode) {
 			case 'ObjectView' : {
-				
+				this.objectList.show();
+				this.doLayout();
 				break;
 			}
 			case 'SetView' : {
-				
+				this.objectList.hide();
+				this.doLayout();
 				break;
 			}
 		}
@@ -296,7 +229,6 @@ var NavigatorView = Ext.extend(AbstractView, {
 		    table = tablesStore.getById(this.objectRecord.modelName),
 		    formItems = [],
 			me = this,
-			statusesStore = Ext.getStore('statuses'),
 			formConfig = {}
 		;
 		
@@ -375,21 +307,84 @@ var NavigatorView = Ext.extend(AbstractView, {
 				);
 			}
 		});
-
+		
 		this.cls = 'objectView';
-
+		
 		formItems.push(createFieldSet(table.columns(), this.objectRecord.modelName, this));
+		
+		if (!this.editable || this.objectRecord.modelName == 'SaleOrder')
+			formItems.push(createDepsList(table.deps(), tablesStore, this));
+			
+		return this.objectForm = Ext.create({
+			xtype: 'form',
+			flex: 2,
+			cls: 'x-navigator-form ' + this.cls,
+			scroll: true,
+			items: formItems
+		});
 	},
 	
 	createObjectList: function() {
+
+		var store = createStore(this.objectRecord.modelName, getSortersConfig(this.objectRecord.modelName, getSortersConfig(this.objectRecord.modelName, {})));
 		
-	},
-	
-	createDepsList: function() {
+		var limit = 0, curPage = 1;
+		if(this.ownerViewConfig.tableRecord.modelName === this.objectRecord.modelName) {
+			
+			limit = this.ownerViewConfig.storeLimit;
+			curPage = this.ownerViewConfig.storePage;
+		}
+		store.load({limit: limit});
+		store.currentPage = curPage;
 		
-	},
-	
-	
+		return this.objectList = Ext.create ({
+			
+			xtype: 'list',
+			cls: 'sidefilter',
+			flex: 1,
+			plugins: limit !== 0 ? new Ext.plugins.ListPagingPlugin({autoPaging: true}) : undefined, 
+			itemTpl: getItemTplMeta(this.objectRecord.modelName, {useDeps: false, onlyKey: true}).itemTpl,
+			store: store,
+			
+			initComponent: function() {
+				var scroll = this.scroll;
+				Ext.List.prototype.initComponent.apply(this, arguments);
+				if (typeof scroll == 'object')
+					this.scroll = scroll;
+			},
+			
+			listeners: {
+				
+				scope: this,
+				
+				refresh: function(list) {
+					if(list.store.getCount() > 1) {
+						
+						var idx = list.store.findExact('id', this.objectRecord.getId());
+						
+						list.selModel.select(idx);
+						
+						item = Ext.fly(list.getNode(idx));
+						item && list.scroller.setOffset({
+							y: -item.getOffsetsTo(list.scrollEl)[1]
+						});
+					}
+				},
+				
+				selectionchange: function(selModel, recs) {
+					
+					if(recs.length) {
+						Ext.dispatch ({
+							controller: 'Navigator',
+							action: 'onObjectListItemSelect',
+							selected: recs[0],
+							view: this
+						})
+					}
+				}
+			}
+		});
+	},	
 	
 	/**
 	 * Overridden
