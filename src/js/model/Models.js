@@ -26,7 +26,7 @@ var createModels = function(tablesStore) {
 			;
 			
 			if (String.right(cName, 3) == 'ing')
-				fieldConfig.defaultValue = column.get('init') || 'draft';
+				fieldConfig.defaultValue = 'draft';
 			
 			cName == 'date'
 				&& validations.push({

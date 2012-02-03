@@ -123,11 +123,15 @@ var NavigatorView = Ext.extend(AbstractView, {
 					];
 
 					var btnPressed = undefined;
+					
+					if(me.objectRecord.phantom) {
+						state = c.get('init');
+					}
 
 					if (me.objectRecord) Ext.each (statusButtons, function(b) {
 
 						Ext.apply(b, btnCfg);
-
+						
 						b.pressed = (b.name == state);
 						
 						b.disabled = true;

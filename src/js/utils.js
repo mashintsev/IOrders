@@ -279,7 +279,7 @@ var createFieldSet = function(columnsStore, modelName, view) {
 	var fsItems = [];
 
 	columnsStore.each(function(column) {
-		if (column.get('label')) {
+		if (column.get('label') && column.get('name') !== 'processing') {
 			var field = {
 				name: column.get('name'),
 				label: column.get('label'),
