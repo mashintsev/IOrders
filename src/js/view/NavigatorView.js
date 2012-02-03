@@ -83,7 +83,6 @@ var NavigatorView = Ext.extend(AbstractView, {
 			sb, {delay: 1000}
 		);
 		
-		
 		this.dockedItems[0].items.push (this.syncButton);
 
 		this.fbBtn = Ext.create({xtype: 'button', name: 'FacebookFeed', text: 'Новости', scope: this});

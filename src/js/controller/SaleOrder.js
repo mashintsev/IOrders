@@ -56,7 +56,9 @@ Ext.regController('SaleOrder', {
 
 		var tc = saleOrderPosStore.sum('cost').toFixed(2);
 
-		view.saleOrder.set ('totalCost', tc);
+		view.saleOrder.set ('totalCost', tc);		
+		view.saleOrder.get('processing') === 'draft' && view.saleOrder.set('processing', 'upload');
+
 		saleOrderPosStore.sync();
 
 		view.saleOrder.save();

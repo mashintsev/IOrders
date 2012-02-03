@@ -256,6 +256,28 @@ Ext.regController('Navigator', {
 
 				rec.fields.getByKey('processing') && this.controlButtonsVisibilities(view, rec.get('processing') != 'draft' && !rec.get('serverPhantom'));
 			}
+            
+            if(rec.modelName === 'SaleOrder' && rec.get('processing') === 'draft') {
+                rec.set('processing', 'upload');
+                
+                var statusBar = form.getComponent('statusToolbar');
+					
+					if(statusBar) {
+						
+						var segBtn = statusBar.getComponent('processing'),
+							state = rec.get('processing');
+						;
+						
+						segBtn.getComponent(state).enable();
+						segBtn.setPressed(state, true, true);
+						segBtn.items.each(function(b) {
+							b.disable();
+							b.canEnable && b[b.canEnable(state) ? 'enable' : 'disable']();
+							b.pressed && b.enable();
+						});
+						
+					}
+            }
 			
 			rec.save();
 			view.fireEvent ('saved', rec);
