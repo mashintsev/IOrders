@@ -62,6 +62,9 @@ Ext.regController('Navigator', {
                 }
             }
             
+            var tableRec = Ext.getStore('tables').getById(t);
+            loadDepData(tableRec, tableRec, undefined, undefined, true);
+            
 		});
 		
         
@@ -176,6 +179,9 @@ Ext.regController('Navigator', {
 				loadDepData(depRec, depTable, view, undefined, true);
 			}
 		}
+        
+        var tableRec = Ext.getStore('tables').getById(table);
+        loadDepData(tableRec, tableRec, undefined, undefined, true);
 	},
 
 	onBackButtonTap: function(options) {
