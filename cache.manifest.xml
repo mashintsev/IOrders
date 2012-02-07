@@ -2,6 +2,8 @@
 <manifest>
     <cache>
         
+        <http>http://connect.facebook.net/ru_RU/all.js</http>
+        
         <file>index.html</file>
         
         <file>src/css/index.css</file>
