@@ -210,10 +210,12 @@ Ext.regApplication({
 										Ext.defer( getLocation, 2000 );
 									}
 								);
-							else
+							else{
+								if (IOrders.lastCoords) IOrders.lastCoords.errorCode = error.code;
 								getLocation();
+							}
 						},
-						{ enableHighAccuracy: true, timeout: 20000 }
+						{ enableHighAccuracy: true, timeout: 30000 }
 					);
 				},
 				saveLocation = function () {
