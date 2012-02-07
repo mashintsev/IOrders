@@ -294,13 +294,13 @@ var createFieldSet = function(columnsStore, modelName, view) {
 						xtype: 'togglefield',
 						listeners: {
 							change: function(slider, thumb, newV, oldV) {
-								/*Ext.dispatch({
+								Ext.dispatch({
 									controller: 'Navigator',
 									action: 'onNavigatorFieldValueChange',
 									field: slider,
 									newValue: newV,
 									oldValue: oldV
-								});*/
+								});
 							}
 						}
 					};

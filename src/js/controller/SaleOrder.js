@@ -65,7 +65,7 @@ Ext.regController('SaleOrder', {
 		view.saleOrder.save();
 		view.saleOrder.commit(true);
 
-		if (view.bonusCost){
+		if (view.bonusCost != '') {
 			view.customerRecord.set (
 				'bonusCost',
 				(view.bonusCost - tc).toFixed(2)
