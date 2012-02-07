@@ -426,7 +426,7 @@ Ext.regController('Main', {
 			rec = view.form.getRecord(),
 			field = view.form.getFields(bar.name)
 		;
-		field.setValue(btn.name);
+
 		rec.set(bar.name, btn.name);
 		
 		if(!rec.phantom)

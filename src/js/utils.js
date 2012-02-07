@@ -282,6 +282,7 @@ var createFieldSet = function(columnsStore, modelName, view) {
 		if (column.get('label') && column.get('name') !== 'processing') {
 			var field = {
 				name: column.get('name'),
+				itemId: column.get('name'),
 				label: column.get('label'),
 				disabled: !column.get('editable')
 			};
@@ -289,7 +290,20 @@ var createFieldSet = function(columnsStore, modelName, view) {
 			var fieldConfig;
 			switch(column.get('type')) {
 				case 'boolean' : {
-					fieldConfig = {xtype: 'togglefield'};
+					fieldConfig = {
+						xtype: 'togglefield',
+						listeners: {
+							change: function(slider, thumb, newV, oldV) {
+								Ext.dispatch({
+									controller: 'Navigator',
+									action: 'onNavigatorFieldValueChange',
+									field: slider,
+									newValue: newV,
+									oldValue: oldV
+								});
+							}
+						}
+					};
 					break;
 				}
 				case 'date' : {
@@ -338,7 +352,7 @@ var createFieldSet = function(columnsStore, modelName, view) {
 		}
 	});
 
-	return { xtype: 'fieldset', items: fsItems };
+	return { xtype: 'fieldset', items: fsItems , itemId: 'formFields'};
 };
 
 var createFilterField = function(objectRecord) {
