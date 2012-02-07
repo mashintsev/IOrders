@@ -1068,7 +1068,7 @@ Ext.regController('Navigator', {
 
 				var saleOrder = view.objectRecord;
 
-				if(field.name == 'isBonus' && options.oldValue != undefined && view.form.getRecord()) {
+				if(field.name == 'isBonus' && options.oldValue != undefined && view.form.recordLoaded) {
 
 					var customerStore = view.form.getComponent('formFields').getComponent('customer').store,
 						customerRecord = customerStore.getById(saleOrder.get('customer')),

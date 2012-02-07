@@ -374,6 +374,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 	loadData: function() {
 
 		this.form.loadRecord(this.objectRecord);
+		this.form.recordLoaded = true;
 		this.isObjectView && this.setFieldsDisabled(!this.editing);
 	},
 	

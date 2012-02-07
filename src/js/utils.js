@@ -422,6 +422,7 @@ var getDepsData = function(depsStore, tablesStore, view, config) {
 			
 			depRec = depTable.copy();
 			depRec.set('contains', dep.get('contains'));
+			depRec.set('editing', view ? view.editing : false);
 			
 			loadDepData(depRec, depTable, view, config ? Ext.apply(config, {data: data}) : undefined);
 			
