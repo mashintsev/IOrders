@@ -88,10 +88,15 @@ Ext.regController('Main', {
 							var errors = formRec.validate();
 							if(errors.isValid()) {
 								formRec.save({success: function() {
+									
+									var tableRec = Ext.getStore('tables').getById(formRec.modelName);
+									loadDepData(tableRec, tableRec, undefined, undefined, true);
 									Ext.dispatch(Ext.apply(options, {
 										controller: 'SaleOrder',
 										saleOrder: navView.objectRecord
 									}));
+									
+									
 								}})
 							} else {
 								var msg = '';
@@ -430,7 +435,10 @@ Ext.regController('Main', {
 		rec.set(bar.name, btn.name);
 		
 		if(!rec.phantom)
-			rec.save();
+			rec.save({callback: function() {
+				var tableRec = Ext.getStore('tables').getById(rec.modelName);
+                loadDepData(tableRec, tableRec, undefined, undefined, true);
+			}});
 		
 		view.fireEvent ('saved', rec);
 

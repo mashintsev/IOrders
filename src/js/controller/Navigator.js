@@ -217,10 +217,12 @@ Ext.regController('Navigator', {
             view.setLoading(true);
             Ext.ModelMgr.getModel(record.modelName).prototype.getProxy().destroy(new Ext.data.Operation({id: record.getId(), records: [record]}), function(operation) {
     
+                var tableRec = Ext.getStore('tables').getById(record.modelName);
+                loadDepData(tableRec, tableRec, undefined, undefined, true);
                 view.setLoading(false);
                 Ext.dispatch(Ext.apply(options, {action: 'goBack'}));
             });
-            loadDepData(Ext.getStore('tables').getById(record.modelName), Ext.getStore('tables').getById(record.modelName), undefined, undefined, true);
+            
         } else {
             Ext.Msg.alert('', 'Нельзя удалить. Запись отправляется на сервер');
         }
@@ -280,10 +282,11 @@ Ext.regController('Navigator', {
 						
 					}
             }
-            
-            loadDepData(Ext.getStore('tables').getById(rec.modelName), Ext.getStore('tables').getById(rec.modelName), undefined, undefined, true);
 			
-			rec.save();
+			rec.save({callback: function() {
+                var tableRec = Ext.getStore('tables').getById(rec.modelName);
+                loadDepData(tableRec, tableRec, undefined, undefined, true);
+            }});
 			view.fireEvent ('saved', rec);
 			
 		} else {
