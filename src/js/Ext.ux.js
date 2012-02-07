@@ -289,8 +289,7 @@ Ext.override(Ext.plugins.PullRefreshPlugin, {
 	}
 });
 
-var version = Ext.platformVersionDetail;
-if(version.major == 1 && version.minor == 0 && version.patch == 3) {
+if(Ext.version === '1.1.1') {
 	Ext.override(Ext.util.Stateful, {
 		set: function(fieldName, value) {
 			var me = this,

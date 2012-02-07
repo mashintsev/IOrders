@@ -220,6 +220,7 @@ Ext.regController('Navigator', {
                 view.setLoading(false);
                 Ext.dispatch(Ext.apply(options, {action: 'goBack'}));
             });
+            loadDepData(Ext.getStore('tables').getById(record.modelName), Ext.getStore('tables').getById(record.modelName), undefined, undefined, true);
         } else {
             Ext.Msg.alert('', 'Нельзя удалить. Запись отправляется на сервер');
         }
@@ -279,6 +280,8 @@ Ext.regController('Navigator', {
 						
 					}
             }
+            
+            loadDepData(Ext.getStore('tables').getById(rec.modelName), Ext.getStore('tables').getById(rec.modelName), undefined, undefined, true);
 			
 			rec.save();
 			view.fireEvent ('saved', rec);
