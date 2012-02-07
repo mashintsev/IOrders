@@ -294,13 +294,13 @@ var createFieldSet = function(columnsStore, modelName, view) {
 						xtype: 'togglefield',
 						listeners: {
 							change: function(slider, thumb, newV, oldV) {
-								Ext.dispatch({
+								/*Ext.dispatch({
 									controller: 'Navigator',
 									action: 'onNavigatorFieldValueChange',
 									field: slider,
 									newValue: newV,
 									oldValue: oldV
-								});
+								});*/
 							}
 						}
 					};
@@ -421,6 +421,7 @@ var getDepsData = function(depsStore, tablesStore, view, config) {
 		   && (isSetView ? config.record.modelName !== depTable.get('id') : true)) {
 			
 			depRec = depTable.copy();
+			depRec.set('contains', dep.get('contains'));
 			
 			loadDepData(depRec, depTable, view, config ? Ext.apply(config, {data: data}) : undefined);
 			
