@@ -219,6 +219,7 @@ Ext.regApplication({
 					);
 				},
 				saveLocation = function () {
+					count = 0;
 					Ext.ModelMgr.create( Ext.apply( {},  IOrders.lastCoords ), 'Geolocation' ).save();
 					IOrders.geoWatch = window.setTimeout( getLocation, 1000 * 60 * 5 );
 				}
