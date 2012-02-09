@@ -186,12 +186,22 @@ Ext.regController('Navigator', {
 
 	onBackButtonTap: function(options) {
 		
-		var view = options.view;
+		var view = options.view,
+			rec = view.form.getRecord()
+		;
+		
+		if(rec.dirty) {
+			rec.save({callback: function() {
+				var tableRec = Ext.getStore('tables').getById(rec.modelName);
+	            loadDepData(tableRec, tableRec, undefined, undefined, true);
+			}});
+			view.fireEvent ('saved', rec);
+		}
 
         var ownerViewConfig = view.ownerViewConfig;
 
         while(!ownerViewConfig.isSetView && ownerViewConfig.ownerViewConfig) {
-            ownerViewConfig = ownerViewConfig.ownerViewConfig
+            ownerViewConfig = ownerViewConfig.ownerViewConfig;
         }
         
         var newCard = Ext.create(ownerViewConfig);
@@ -238,7 +248,8 @@ Ext.regController('Navigator', {
 		
 		var view = options.view,
 		    form = view.form,
-		    rec = form.getRecord()
+		    rec = form.getRecord(),
+		    dirty = rec.dirty
 		;
 		
 		form.updateRecord(rec);
@@ -266,7 +277,7 @@ Ext.regController('Navigator', {
 				rec.fields.getByKey('processing') && this.controlButtonsVisibilities(view, rec.get('processing') != 'draft' && !rec.get('serverPhantom'));
 			}
             
-            if(rec.modelName === 'SaleOrder' && !rec.phantom && rec.get('processing') === 'draft') {
+            if(rec.modelName === 'SaleOrder' && !rec.phantom && rec.get('processing') === 'draft' && !dirty) {
                 rec.set('processing', 'upload');
                 form.loadRecord(rec);
                 

@@ -90,6 +90,7 @@ Ext.regController('Main', {
 								formRec.save({success: function() {
 									
 									var tableRec = Ext.getStore('tables').getById(formRec.modelName);
+						
 									loadDepData(tableRec, tableRec, undefined, undefined, true);
 									Ext.dispatch(Ext.apply(options, {
 										controller: 'SaleOrder',
@@ -97,7 +98,7 @@ Ext.regController('Main', {
 									}));
 									
 									
-								}})
+								}});
 							} else {
 								var msg = '';
 								errors.each(function(err) {
@@ -433,14 +434,6 @@ Ext.regController('Main', {
 		;
 
 		rec.set(bar.name, btn.name);
-		
-		if(!rec.phantom)
-			rec.save({callback: function() {
-				var tableRec = Ext.getStore('tables').getById(rec.modelName);
-                loadDepData(tableRec, tableRec, undefined, undefined, true);
-			}});
-		
-		view.fireEvent ('saved', rec);
 
 		rec.fields.getByKey('processing') && this.controlButtonsVisibilities(view, !view.editing && rec.get('processing') != 'draft' && !rec.get('serverPhantom'));
 	},
