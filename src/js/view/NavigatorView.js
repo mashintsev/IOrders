@@ -124,6 +124,8 @@ var NavigatorView = Ext.extend(AbstractView, {
 
 					var btnPressed = undefined;
 					
+					statusButtons.forEach( function(b) { if (b.name) b.cls = 'make-'+b.name } );
+					
 					if(me.objectRecord.phantom) {
 						state = c.get('init');
 					}
@@ -200,7 +202,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 				
 				spacerExist || this.dockedItems[0].items.push({xtype: 'spacer'});
 				this.dockedItems[0].items.push(
-					{itemId: 'Cancel', name: 'Cancel', text: 'Отменить', hidden: true, scope: this},
+//					{cls: 'x-hidden-display', itemId: 'Cancel', name: 'Cancel', text: 'Отменить', hidden: true, scope: this},
 					{
 						itemId: 'SaveEdit',
 						name: this.editing ? 'Save' : 'Edit',

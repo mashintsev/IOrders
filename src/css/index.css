@@ -342,3 +342,7 @@
 	background-size: 40px 26px;
 	background-repeat: no-repeat;
 }
+
+.make-draft.x-button-pressed .x-button-label {
+	color: blue;
+}

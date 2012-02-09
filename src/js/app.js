@@ -8,7 +8,20 @@ console.log = function() {
 };
 
 applicationCache.addEventListener('updateready', function() {
-	location.reload();
+	
+	window.applicationCache.swapCache();
+	
+	Ext.Msg.confirm(
+		'Обновление программы',
+		'<p>Получена новая версия, необходимо перезапустить программу.</p>' +
+		'<p>Можно перезапуститься ?</p>',
+		function (yn) {
+			if (yn == 'yes'){
+				location.reload();
+			}
+		}
+	);
+	
 });
 
 

@@ -260,7 +260,7 @@ Ext.regController('Navigator', {
 				
 				var toolbar = btn.up('toolbar');
 				
-				toolbar.getComponent('Cancel').hide();
+				//toolbar.getComponent('Cancel').hide();
 				Ext.dispatch(Ext.apply(options, {action: 'setEditing', editing: false}));
 
 				rec.fields.getByKey('processing') && this.controlButtonsVisibilities(view, rec.get('processing') != 'draft' && !rec.get('serverPhantom'));
@@ -320,7 +320,7 @@ Ext.regController('Navigator', {
             });
             
             var toolbar = btn.up('toolbar');
-            toolbar.getComponent('Cancel').show();
+            //toolbar.getComponent('Cancel').show();
             
             Ext.dispatch(Ext.apply(options, {action: 'setEditing', editing: true}));
         } else {
@@ -340,7 +340,7 @@ Ext.regController('Navigator', {
 		options.view.form.load(options.view.form.getRecord());
 		
 		var toolbar = options.btn.up('toolbar');
-		toolbar.getComponent('Cancel').hide();
+		//toolbar.getComponent('Cancel').hide();
 		
 		var saveEditBtn = toolbar.getComponent('SaveEdit');
 		
