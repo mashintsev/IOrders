@@ -87,14 +87,34 @@ Ext.regController('Main', {
 							
 							var errors = formRec.validate();
 							if(errors.isValid()) {
+								
+								var statusBar = form.getComponent('statusToolbar'),
+									state = undefined
+								;
+									
+								if(statusBar) {
+									
+									var segBtn = statusBar.getComponent('processing');
+									
+									segBtn.items.each(function(b) {
+										if(b.pressed) {
+											state = b.name;
+											return false;
+										}
+										return true;
+									});
+									
+								}
+								
 								formRec.save({success: function() {
 									
 									var tableRec = Ext.getStore('tables').getById(formRec.modelName);
-						
+									
 									loadDepData(tableRec, tableRec, undefined, undefined, true);
 									Ext.dispatch(Ext.apply(options, {
 										controller: 'SaleOrder',
-										saleOrder: navView.objectRecord
+										saleOrder: navView.objectRecord,
+										saleOrderStatus: state
 									}));
 									
 									
@@ -434,6 +454,13 @@ Ext.regController('Main', {
 		;
 
 		rec.set(bar.name, btn.name);
+		
+		if(!rec.get('isNew')) {
+			rec.save({callback: function() {
+                var tableRec = Ext.getStore('tables').getById(rec.modelName);
+                loadDepData(tableRec, tableRec, undefined, undefined, true);
+            }});
+		}
 
 		rec.fields.getByKey('processing') && this.controlButtonsVisibilities(view, !view.editing && rec.get('processing') != 'draft' && !rec.get('serverPhantom'));
 	},

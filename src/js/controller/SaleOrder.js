@@ -17,8 +17,10 @@ Ext.regController('SaleOrder', {
 
 	onSaveButtonTap: function(options) {
 
-		options.view.saleOrder.get('processing') === 'draft' && options.view.saleOrder.set('processing', 'upload');
+		var saleOrder = options.view.saleOrder;
+		saleOrder.get('isNew') && saleOrder.set('processing', options.view.saleOrderStatus);
 
+		saleOrder.set('isNew', false);
 		Ext.dispatch(Ext.apply(options, {
 			action: 'saveOffer'
 		}));
@@ -101,6 +103,7 @@ Ext.regController('SaleOrder', {
 			var newCard = Ext.create({
 				xtype: 'saleorderview',
 				saleOrder: options.saleOrder,
+				saleOrderStatus: options.saleOrderStatus,
 				ownerViewConfig: {
                     xtype: 'navigatorview',
                     layout: IOrders.newDesign ? {type: 'hbox', pack: 'justify', align: 'stretch'} : 'fit',
