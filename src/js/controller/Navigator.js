@@ -260,6 +260,28 @@ Ext.regController('Navigator', {
 				options.view.depStore.each(function(rec) {
 					rec.set('editing', false);
 				});
+                
+                if(options.view.isNew) {
+                    var statusBar = form.getComponent('statusToolbar'),
+                        state = undefined
+                    ;
+                        
+                    if(statusBar) {
+                        
+                        var segBtn = statusBar.getComponent('processing');
+                        
+                        segBtn.items.each(function(b) {
+                            if(b.pressed) {
+                                state = b.name;
+                                return false;
+                            }
+                            return true;
+                        });
+                        
+                    }
+                    
+                    rec.set('processing', state);
+                }
 				
 				var toolbar = btn.up('toolbar');
                 
