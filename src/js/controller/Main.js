@@ -114,7 +114,8 @@ Ext.regController('Main', {
 									Ext.dispatch(Ext.apply(options, {
 										controller: 'SaleOrder',
 										saleOrder: navView.objectRecord,
-										saleOrderStatus: state
+										saleOrderStatus: state,
+										isNew: navView.isNew
 									}));
 									
 									
@@ -455,7 +456,7 @@ Ext.regController('Main', {
 
 		rec.set(bar.name, btn.name);
 		
-		if(!rec.get('isNew')) {
+		if(!view.isNew) {
 			rec.save({callback: function() {
                 var tableRec = Ext.getStore('tables').getById(rec.modelName);
                 loadDepData(tableRec, tableRec, undefined, undefined, true);

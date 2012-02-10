@@ -2,7 +2,9 @@ Ext.regController('SaleOrder', {
 
 	onBackButtonTap: function(options) {
 		
-		options.view.ownerViewConfig.editing = !(options.closeEditing || false) ;
+		options.view.ownerViewConfig.editing = !(options.closeEditing || false);
+		options.view.ownerViewConfig.isNew = options.view.isNew;
+		options.view.ownerViewConfig.saleOrderStatus = options.view.saleOrderStatus;
 		
 		IOrders.viewport.setActiveItem(Ext.create(options.view.ownerViewConfig), IOrders.viewport.anims.back);
 		
@@ -18,9 +20,9 @@ Ext.regController('SaleOrder', {
 	onSaveButtonTap: function(options) {
 
 		var saleOrder = options.view.saleOrder;
-		saleOrder.get('isNew') && saleOrder.set('processing', options.view.saleOrderStatus);
+		options.view.isNew && saleOrder.set('processing', options.view.saleOrderStatus);
 
-		saleOrder.set('isNew', false);
+		options.view.isNew = false;
 		Ext.dispatch(Ext.apply(options, {
 			action: 'saveOffer'
 		}));
@@ -104,6 +106,7 @@ Ext.regController('SaleOrder', {
 				xtype: 'saleorderview',
 				saleOrder: options.saleOrder,
 				saleOrderStatus: options.saleOrderStatus,
+				isNew: options.isNew,
 				ownerViewConfig: {
                     xtype: 'navigatorview',
                     layout: IOrders.newDesign ? {type: 'hbox', pack: 'justify', align: 'stretch'} : 'fit',

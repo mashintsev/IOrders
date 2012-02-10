@@ -126,8 +126,8 @@ var NavigatorView = Ext.extend(AbstractView, {
 					
 					statusButtons.forEach( function(b) { if (b.name) b.cls = 'make-'+b.name } );
 					
-					if(me.objectRecord.phantom) {
-						state = c.get('init');
+					if(me.objectRecord.phantom || me.isNew) {
+						state = me.saleOrderStatus || c.get('init');
 					}
 
 					if (me.objectRecord) Ext.each (statusButtons, function(b) {

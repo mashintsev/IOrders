@@ -262,37 +262,13 @@ Ext.regController('Navigator', {
 				});
 				
 				var toolbar = btn.up('toolbar');
-				
-				
+                
 				Ext.dispatch(Ext.apply(options, {action: 'setEditing', editing: false}));
 
 				rec.fields.getByKey('processing') && this.controlButtonsVisibilities(view, rec.get('processing') != 'draft' && !rec.get('serverPhantom'));
 			}
-            
-            if(rec.modelName === 'SaleOrder' && rec.get('processing') === 'draft' && !rec.get('isNew')) {
-                rec.set('processing', 'upload');
-                form.loadRecord(rec);
-                
-                var statusBar = form.getComponent('statusToolbar');
-					
-					if(statusBar) {
-						
-						var segBtn = statusBar.getComponent('processing'),
-							state = rec.get('processing');
-						;
-						
-						segBtn.getComponent(state).enable();
-						segBtn.setPressed(state, true, true);
-						segBtn.items.each(function(b) {
-							b.disable();
-							b.canEnable && b[b.canEnable(state) ? 'enable' : 'disable']();
-							b.pressed && b.enable();
-						});
-						
-					}
-            }
 			
-            rec.set('isNew', false);
+            view.isNew = false;
             
 			rec.save({callback: function() {
                 var tableRec = Ext.getStore('tables').getById(rec.modelName);
@@ -389,14 +365,14 @@ Ext.regController('Navigator', {
                 parentColumns = tableRec.getParentColumns()
             ;
 
-            rec = Ext.ModelMgr.create({isNew: true, serverPhantom: true}, options.view.objectRecord.modelName);
+            rec = Ext.ModelMgr.create({serverPhantom: true}, options.view.objectRecord.modelName);
 
             parentColumns.each(function(col) {
                 rec.set(col.get('name'), options.view.objectRecord.get(col.get('name')));
             });
 
 		} else if(options.view.isSetView) {
-			rec = Ext.ModelMgr.create({isNew: true, serverPhantom: true}, options.view.tableRecord);
+			rec = Ext.ModelMgr.create({serverPhantom: true}, options.view.tableRecord);
 			
 			rec.set (
 				options.view.objectRecord.modelName.toLowerCase(),
@@ -413,7 +389,7 @@ Ext.regController('Navigator', {
 
 			Ext.dispatch(Ext.apply(options, {action: 'createUncashmentView'}));
 		} else {
-			IOrders.viewport.setActiveItem(Ext.create(createNavigatorView(rec, oldCard, false, true)));
+			IOrders.viewport.setActiveItem(Ext.create(Ext.apply(createNavigatorView(rec, oldCard, false, true), {isNew: true})));
 		}
 		
 		
@@ -452,7 +428,7 @@ Ext.regController('Navigator', {
 					
 				Ext.defer ( function () {
 					
-					rec = Ext.ModelMgr.create({isNew: true, serverPhantom: true}, createdRecordModelName);
+					rec = Ext.ModelMgr.create({serverPhantom: true}, createdRecordModelName);
 					rec.set( objectRecord.modelName.toLowerCase(), objectRecord.getId() );
 					
 					if (rec.modelName === 'SaleOrder')
@@ -583,7 +559,7 @@ Ext.regController('Navigator', {
 				isWhite: debt.get('isWhite'), datetime: new Date().format('Y-m-d H:i:s'),
 				customer: view.customerRecord.getId(), debt: debt.getId(),
 				summ: parseFloat(debt.get('encashSumm')).toFixed(2),
-				uncashment: undefined, serverPhantom: true, isNew: true,
+				uncashment: undefined, serverPhantom: true,
 			}, 'Encashment'));
 		});
 		
@@ -601,7 +577,7 @@ Ext.regController('Navigator', {
 		Ext.dispatch(Ext.apply(options, {
 			action: 'createAndActivateView',
 			editing: true,
-			record: Ext.ModelMgr.create({customer: view.customerSelect.getValue(), date: getNextWorkDay(), serverPhantom: true, isNew: true}, 'EncashmentRequest'),
+			record: Ext.ModelMgr.create({customer: view.customerSelect.getValue(), date: getNextWorkDay(), serverPhantom: true}, 'EncashmentRequest'),
 			config: {ownerViewConfig: {xtype: 'encashmentview', partnerRecord: view.partnerRecord, customerRecord: view.objectRecord, ownerViewConfig: view.ownerViewConfig}}
 		}));
 	},
@@ -734,8 +710,7 @@ Ext.regController('Navigator', {
 					totalSumm: totalSumm.toFixed(2),
 					totalSummWhite: totalSummWhite.toFixed(2),
 					datetime: new Date().format('Y-m-d H:i:s'),
-					serverPhantom: true,
-                    isNew: true,
+					serverPhantom: true
 				}, 'Uncashment'
 			);
 			
@@ -781,13 +756,13 @@ Ext.regController('Navigator', {
 			objectRecord: objectRecord
 		});
 		
-		var newCard = Ext.create(createNavigatorView(
+		var newCard = Ext.create(Ext.apply(createNavigatorView(
 			objectRecord,
 			IOrders.viewport.getActiveItem(),
 			options.isSetView,
 			options.editing,
 			config
-		));
+		), {isNew: objectRecord.phantom}));
 		
 		if (newCard.isSetView) {
 			Ext.dispatch(Ext.apply(options, {action: 'loadSetViewStore', newCard: newCard}));
