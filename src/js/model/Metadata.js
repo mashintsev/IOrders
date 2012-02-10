@@ -57,6 +57,9 @@ Ext.regModel('Table', {
 			root: 'tables'
 		}
 	},
+	hasColumn: function(name) {
+		return this.columns().findExact('name', name) !== -1 ? true : false;
+	},
 	hasIdColumn: function() {
 		return this.columns().findExact('name', 'id') !== -1 ? true : false;
 	},

@@ -228,6 +228,15 @@ function getItemTpl (modelName) {
 					+	'<tpl if="extendable && (!editing && !contains || editing && contains)"><div class="x-button extend add">+</div></tpl>'
 				 + '</div>';
 		}
+		case 'MainMenu': {
+			return '<div class="hbox dep <tpl if="loading">loading</tpl>">'
+					+	'<div class="count"><tpl if="count &gt; 0">{count}</tpl></div>'
+					+	'<div class="stats"><tpl if="stats != \'0\'">{stats}</tpl></div>'
+					+	'<div class="data">{nameSet}</div>'
+					+	'<div class="aggregates">{aggregates}</div>'
+				 + '</div>'
+				 +	'<tpl if="extendable && (!editing && !contains || editing && contains)"><div class="x-button extend add">+</div></tpl>';
+		}
 		case 'Debt' : {
 			return '<div class="hbox dep">'
 					+ '<div class="data">'
@@ -384,11 +393,6 @@ function createDepsList(depsStore, tableStore, view) {
 		remoteFilter: false,
 		remoteSort: false,
 		data: getDepsData(depsStore, tableStore, view),
-		countFilter: new Ext.util.Filter({
-		    filterFn: function(item) {
-		        return item.get('count') > 0 || item.get('extendable');
-		    }
-		}),
 		listeners: {
 			update: function(grid, rec) {
 				tableStore.getById(rec.getId()).set(rec.data);
@@ -405,6 +409,34 @@ function createDepsList(depsStore, tableStore, view) {
 		store: view.depStore
 	});
 };
+
+var createMainMenu = function(depStore, tableStore, view) {
+	
+	view.depStore = new Ext.data.Store({
+		model: 'Dep',
+		remoteFilter: false,
+		remoteSort: false,
+		data: getDepsData(depStore, tableStore, view, {filters: [
+			function(item) {
+				return item.hasColumn('date') || item.get('extendable');
+			}
+		]}),
+		listeners: {
+			update: function(list, rec) {
+				tableStore.getById(rec.getId()).set(rec.data);
+			}
+		}
+	});
+	
+	return view.depList = Ext.create({
+		xtype: 'list',
+		cls: 'x-deps-list x-main-menu',
+		itemTpl: getItemTpl('MainMenu'),
+		scroll: false,
+		disableSelection: true,
+		store: view.depStore
+	});
+}
 
 var getDepsData = function(depsStore, tablesStore, view, config) {
 
@@ -429,7 +461,15 @@ var getDepsData = function(depsStore, tablesStore, view, config) {
 			if(isSetView) {
 				data.push(depRec.data);
 			} else {
-				data.push(depRec);
+				if(config && config.filters) {
+					var doAdd = true;
+					Ext.each(config.filters, function(filter) {
+						doAdd = doAdd && filter.call(this, depTable);
+					});
+					data.push(depRec);
+				} else {
+					data.push(depRec);
+				}
 			}
 		}
 	});

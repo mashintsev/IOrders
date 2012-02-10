@@ -232,8 +232,11 @@ var NavigatorView = Ext.extend(AbstractView, {
 				
 			}
 			
-			if (!this.editable || this.objectRecord.modelName == 'SaleOrder')
+			if(this.objectRecord.modelName === 'MainMenu' && IOrders.newDesign) {
+				formItems.push(createMainMenu(table.deps(), tablesStore, this));
+			} else if (!this.editable || this.objectRecord.modelName == 'SaleOrder') {
 				formItems.push(createDepsList(table.deps(), tablesStore, this));
+			}
 
 			if(IOrders.newDesign && table.hasNameColumn()) {
 
