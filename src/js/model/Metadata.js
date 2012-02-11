@@ -35,7 +35,16 @@ Ext.regModel('Table', {
 		{name: 'belongs', type: 'string'},
 		{name: 'deletable', type: 'string'},
 		{name: 'mainMenu', type: 'boolean'},
-		{name: 'level', type: 'int'}
+		{name: 'level', type: 'int'},
+		//from Dep
+		{name: 'editing', type: 'boolean'},
+		{name: 'count', type: 'int'},
+		{name: 'contains', type: 'boolean'},
+		{name: 'aggregates', type: 'string'},
+		{name: 'stats', type: 'string'},
+		{name: 'hidden', type: 'boolean'},
+		{name: 'loading', type: 'boolean'},
+		{name: 'filtered', type: 'boolean'}
 	],
  	associations: [
 		{type: 'hasMany', model: 'Column', name: 'columns'},
@@ -76,6 +85,9 @@ Ext.regModel('Table', {
 	},
 	getTitleColumns: function() {
 		return this.columns().queryBy(function(rec) {return rec.get('title') == true ? true : false;});
+	},
+	getParentColumns: function() {
+		return this.columns().queryBy(function(rec) {return rec.get('parent') ? true : false;});
 	}
 });
 
@@ -102,17 +114,7 @@ Ext.regModel('Column', {
 
 Ext.regModel('Dep', {
 	fields: [
-		{name: 'id', type: 'string'},
-		{name: 'name', type: 'string'},
-		{name: 'parent', type: 'string'},
-		{name: 'table_id', type: 'string'},
-		{name: 'extendable', type: 'boolean'},
-		{name: 'editing', type: 'boolean'},
-		{name: 'count', type: 'int'},
-		{name: 'contains', type: 'boolean'},
-		{name: 'aggregates', type: 'string'},
-		{name: 'stats', type: 'string'},
-		{name: 'hidden', type: 'boolean'}
+		
 	]
 });
 

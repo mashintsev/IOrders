@@ -18,7 +18,7 @@ Ext.plugins.ListPagingPlugin = Ext.extend(Ext.util.Observable, {
 
 	onBeforeLoad : function() {
 		if (this.loading && this.list.store.getCount() > 0) {
-			this.list.loadMask.disable();
+			this.list.setLoading(false)
 			return false;
 		}
 

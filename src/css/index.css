@@ -326,6 +326,23 @@
 	margin: 1em 0 1em 1em;
 }
 
-.statuses {
+.statuses- {
 	margin-bottom: 1em;
+}
+
+.statusDesc .x-panel-body {
+	padding: 0.5em 0.5em 1em;
+	font-size: 0.7em;
+	font-weight: bold;
+}
+
+.loading .count {
+	background-image: url(loading.gif);
+	background-position: center;
+	background-size: 40px 26px;
+	background-repeat: no-repeat;
+}
+
+.make-draft.x-button-pressed .x-button-label {
+	color: blue;
 }

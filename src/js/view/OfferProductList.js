@@ -4,7 +4,6 @@ var offerProductList = {
 	cls: 'x-product-list',
 	itemTpl: getItemTpl('OfferProduct'),
 	selectedItemCls: 'x-product-selected',
-	pinHeaders: false,
 
 	listeners: {
 

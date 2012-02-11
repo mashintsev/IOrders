@@ -72,7 +72,7 @@ Ext.regController('Main', {
 		;
 		
 		if(navView) {
-			switch(rec.get('table_id')) {
+			switch(rec.get('id')) {
 				case 'SaleOrderPosition' : {
 					
 					var target = Ext.get(options.event.target);
@@ -87,12 +87,39 @@ Ext.regController('Main', {
 							
 							var errors = formRec.validate();
 							if(errors.isValid()) {
+								
+								var statusBar = form.getComponent('statusToolbar'),
+									state = undefined
+								;
+									
+								if(statusBar) {
+									
+									var segBtn = statusBar.getComponent('processing');
+									
+									segBtn.items.each(function(b) {
+										if(b.pressed) {
+											state = b.name;
+											return false;
+										}
+										return true;
+									});
+									
+								}
+								
 								formRec.save({success: function() {
+									
+									var tableRec = Ext.getStore('tables').getById(formRec.modelName);
+									
+									loadDepData(tableRec, tableRec, undefined, undefined, true);
 									Ext.dispatch(Ext.apply(options, {
 										controller: 'SaleOrder',
-										saleOrder: navView.objectRecord
+										saleOrder: navView.objectRecord,
+										saleOrderStatus: state,
+										isNew: navView.isNew
 									}));
-								}})
+									
+									
+								}});
 							} else {
 								var msg = '';
 								errors.each(function(err) {
@@ -225,6 +252,8 @@ Ext.regController('Main', {
 			IOrders.xi.username = login;
 			IOrders.xi.password = password;
 			
+			IOrders.viewport.setLoading('Проверяю пароль');
+			
 			IOrders.xi.reconnect(IOrders.getMetadata);
 		} else {
 			Ext.Msg.alert('Авторизация', 'Введите логин и пароль');
@@ -317,7 +346,10 @@ Ext.regController('Main', {
 				IOrders.dbeng.clearListeners();
 				
 				IOrders.viewport.setLoading({msg: 'Все стираю ...'});
-				IOrders.dbeng.on ('dbstart', function() {location.reload()});
+				IOrders.dbeng.on ('dbstart', function() {
+					localStorage.setItem ('needSync', true);
+					location.reload();
+				});
 				
 				IOrders.dbeng.startDatabase (
 					Ext.decode(localStorage.getItem('metadata')),
@@ -421,11 +453,15 @@ Ext.regController('Main', {
 			rec = view.form.getRecord(),
 			field = view.form.getFields(bar.name)
 		;
-		field.setValue( btn.name );
-		rec.set( bar.name, btn.name );
-		rec.save();
+
+		rec.set(bar.name, btn.name);
 		
-		view.fireEvent ('saved', rec);
+		if(!view.isNew) {
+			rec.save({callback: function() {
+                var tableRec = Ext.getStore('tables').getById(rec.modelName);
+                loadDepData(tableRec, tableRec, undefined, undefined, true);
+            }});
+		}
 
 		rec.fields.getByKey('processing') && this.controlButtonsVisibilities(view, !view.editing && rec.get('processing') != 'draft' && !rec.get('serverPhantom'));
 	},

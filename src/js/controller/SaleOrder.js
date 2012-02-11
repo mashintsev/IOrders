@@ -2,7 +2,9 @@ Ext.regController('SaleOrder', {
 
 	onBackButtonTap: function(options) {
 		
-		options.view.ownerViewConfig.editing = !(options.closeEditing || false) ;
+		options.view.ownerViewConfig.editing = !(options.closeEditing || false);
+		options.view.ownerViewConfig.isNew = options.view.isNew;
+		options.view.ownerViewConfig.saleOrderStatus = options.view.saleOrderStatus;
 		
 		IOrders.viewport.setActiveItem(Ext.create(options.view.ownerViewConfig), IOrders.viewport.anims.back);
 		
@@ -16,7 +18,11 @@ Ext.regController('SaleOrder', {
 	},
 
 	onSaveButtonTap: function(options) {
-		
+
+		var saleOrder = options.view.saleOrder;
+		options.view.isNew && saleOrder.set('processing', options.view.saleOrderStatus);
+
+		options.view.isNew = false;
 		Ext.dispatch(Ext.apply(options, {
 			action: 'saveOffer'
 		}));
@@ -57,12 +63,13 @@ Ext.regController('SaleOrder', {
 		var tc = saleOrderPosStore.sum('cost').toFixed(2);
 
 		view.saleOrder.set ('totalCost', tc);
+
 		saleOrderPosStore.sync();
 
 		view.saleOrder.save();
 		view.saleOrder.commit(true);
 
-		if (view.bonusCost){
+		if (view.bonusCost != '') {
 			view.customerRecord.set (
 				'bonusCost',
 				(view.bonusCost - tc).toFixed(2)
@@ -98,6 +105,8 @@ Ext.regController('SaleOrder', {
 			var newCard = Ext.create({
 				xtype: 'saleorderview',
 				saleOrder: options.saleOrder,
+				saleOrderStatus: options.saleOrderStatus,
+				isNew: options.isNew,
 				ownerViewConfig: {
                     xtype: 'navigatorview',
                     layout: IOrders.newDesign ? {type: 'hbox', pack: 'justify', align: 'stretch'} : 'fit',
@@ -126,7 +135,7 @@ Ext.regController('SaleOrder', {
 						
 						newCard.productStore = createStore('Offer', {
 							remoteFilter: true,
-							remoteSort: true,
+							remoteSort: false,
 							groupField: 'firstName',
 							getGroupString: function(rec) {
 								return rec.get(this.groupField).replace(/ /g, '_');

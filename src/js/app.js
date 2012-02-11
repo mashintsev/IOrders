@@ -8,7 +8,20 @@ console.log = function() {
 };
 
 applicationCache.addEventListener('updateready', function() {
-	location.reload();
+	
+	window.applicationCache.swapCache();
+	
+	Ext.Msg.confirm(
+		'Обновление программы',
+		'<p>Получена новая версия, необходимо перезапустить программу.</p>' +
+		'<p>Можно перезапуститься ?</p>',
+		function (yn) {
+			if (yn == 'yes'){
+				location.reload();
+			}
+		}
+	);
+	
 });
 
 
@@ -53,23 +66,8 @@ Ext.regApplication({
 					
 					tStore.getProxy().data = this.metadata;
 					tStore.load(function() {IOrders.init();});
+					IOrders.geoTrack();
 					
-					if (db.clean){
-						vp.setLoading(true);
-						vp.mon (
-							IOrders.xi.connection,
-							'requestcomplete',
-							function(){ vp.setLoading(false); },
-							vp, {delay: 1000}
-						);
-						vp.mon (
-							IOrders.xi.connection,
-							'requestexception',
-							function(){ vp.setLoading(false); },
-							vp, {delay: 1000}
-						);
-						IOrders.xi.download(IOrders.dbeng);
-					}
 				},
 				fail: function() {
 					localStorage.clear();
@@ -91,6 +89,8 @@ Ext.regApplication({
 					command: 'metadata',
 					success: function(response) {
 						var m = response.responseXML;
+						
+						IOrders.viewport.setLoading(false);
 						
 						console.log(m);
 						
@@ -129,59 +129,118 @@ Ext.regApplication({
 			
 		} else {
 			
+			Ext.dispatch({controller: 'Navigator', action: 'afterAppLaunch'});
+			
 			Ext.apply (this.xi, {
 				username: localStorage.getItem('login'),
 				password: localStorage.getItem('password')
 			});
 			
-			if (!this.xi.noServer){
-				var r = function(db) {
-					if (!db.clean) {
-						IOrders.xi.login ({
-							success: function() {
-								p = new Ext.data.SQLiteProxy({engine: IOrders.dbeng, model: 'ToUpload'});
-								
-								p.count(new Ext.data.Operation(),
-									function(o) {
-										if (o.result == 0)
-											Ext.dispatch ({controller: 'Main', action: 'onXiMetaButtonTap', silent: true});
-										else
-											console.log ('There are unuploaded data');
-									}
-								);
-							}
-						});
-					}
-				}, f = function() {
-					IOrders.xi.reconnect({
-						success: function() {
+			var r = function(db) {
+				IOrders.xi.login ({
+					success: function() {
+						if (db.clean || localStorage.getItem('needSync') == 'true'){
+							localStorage.removeItem('needSync');
+							IOrders.xi.download(IOrders.dbeng);
+						} else {
 							p = new Ext.data.SQLiteProxy({engine: IOrders.dbeng, model: 'ToUpload'});
 							
-							Ext.Msg.confirm ('Не удалось обновить БД', 'Проверим метаданные?', function (b) {
-								if (b == 'yes')
-									IOrders.xi.request( {
-										command: 'logoff',
-										success: function() {
-											this.sessionData.id = false;
-											this.login({
-												success: function() {
-													Ext.dispatch ({controller: 'Main', action: 'onXiMetaButtonTap'});
-												}
-											});
-										}
-									})
-							});
+							p.count(new Ext.data.Operation(),
+								function(o) {
+									if (o.result == 0)
+										Ext.dispatch ({controller: 'Main', action: 'onXiMetaButtonTap', silent: true});
+									else
+										console.log ('There are unuploaded data');
+								}
+							);
 						}
-				});};
-
-					
-				this.dbeng.on ('dbstart', r);
-				this.dbeng.on ('upgradefail', f);
-			}
+					}
+				});
+			}, f = function() {
+				IOrders.xi.reconnect({
+					success: function() {
+						p = new Ext.data.SQLiteProxy({engine: IOrders.dbeng, model: 'ToUpload'});
+						
+						Ext.Msg.confirm ('Не удалось обновить БД', 'Проверим метаданные?', function (b) {
+							if (b == 'yes')
+								IOrders.xi.request( {
+									command: 'logoff',
+									success: function() {
+										this.sessionData.id = false;
+										this.login({
+											success: function() {
+												Ext.dispatch ({controller: 'Main', action: 'onXiMetaButtonTap'});
+											}
+										});
+									}
+								})
+						});
+					}
+			});};
+			
+			
+			this.dbeng.on ('dbstart', r);
+			this.dbeng.on ('upgradefail', f);
 			
 			this.dbeng.startDatabase(metadata);
-
-			Ext.dispatch({controller: 'Navigator', action: 'afterAppLaunch'});
-		}
+		};
+		
+	},
+	
+	
+	geoTrack: function() {
+		if (Ext.ModelMgr.getModel('Geolocation')) {
+			
+			var count = 0,
+				getLocation = function () {
+					if ( ++count > 6 )
+						IOrders.lastCoords && saveLocation();
+					else navigator.geolocation.getCurrentPosition (
+						function(l) {
+							
+							console.log ('Geolocation success at step ' + count + ': acc=' + l.coords.accuracy);
+							
+							IOrders.lastCoords = l.coords;
+							
+							if(l.coords.accuracy < 10)
+								saveLocation();
+							else
+								getLocation()
+							;
+							
+						},
+						function(error) {
+							
+							console.log( 'Geolocation error at step ' + count + ': ' + error.message + ', code: ' + error.code );
+							
+							if( error.code === 1 )
+								Ext.Msg.alert('Геолокация запрещена',
+									'iOrders нормально работать не будет. <br/><br/>'
+										+ 'Зайдите в "Настройки"->"Основные"->"Сброс", нажмите "Сбросить предупр. размещения". '
+										+ '<br/><br/> Затем, разрешите отслеживание местоположения.',
+									function(btn) {
+										count = 0;
+										Ext.defer( getLocation, 2000 );
+									}
+								);
+							else{
+								if (IOrders.lastCoords) IOrders.lastCoords.errorCode = error.code;
+								getLocation();
+							}
+						},
+						{ enableHighAccuracy: true, timeout: 30000 }
+					);
+				},
+				saveLocation = function () {
+					count = 0;
+					Ext.ModelMgr.create( Ext.apply( {},  IOrders.lastCoords ), 'Geolocation' ).save();
+					IOrders.geoWatch = window.setTimeout( getLocation, 1000 * 60 * 5 );
+				}
+			;
+			
+			Ext.defer( getLocation, 15000 );
+			
+		};
 	}
+	
 });

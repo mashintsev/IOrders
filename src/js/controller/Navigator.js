@@ -3,7 +3,27 @@ Ext.regController('Navigator', {
 	afterAppLaunch: function(options) {
 		
 		this.mon(IOrders.xi, 'uploadrecord', this.onUploadRecord, this);
-		this.mon(IOrders.xi, 'tableload', this.onUploadTable, this);
+		this.mon(IOrders.xi, 'tableload', this.onTableLoad, this);
+        
+        this.mon(IOrders.xi, 'pullrefresh', function(modelName) {
+			if(IOrders.xi.fireEvent ('beforetableload', modelName) !== false) {
+                IOrders.xi.request ({
+                    command: 'download',
+                    timeout: 120000,
+                    scope: IOrders.dbeng,
+                    success: function( r,o ) {
+                        IOrders.dbeng.processDowloadData (r,o);
+                        var data = Ext.DomQuery.select ( o.params.filter, r.responseXML );
+                        if ( !data || data.length == 0 )
+                            IOrders.xi.fireEvent ('tableloadfull', o.params.filter);
+                    },
+                    xi: IOrders.xi,
+                    params: {filter: modelName}
+                });
+            }
+        }, this);
+		
+		IOrders.xi.on ('beforetableload', this.beforeTableLoad);
 		
 		IOrders.xi.on ('tableloadfull', function(t) {
 			var s = Ext.getStore (t);
@@ -12,9 +32,58 @@ Ext.regController('Navigator', {
 				s.currentPage = 1;
 				s.load();
 			}
+            
+            var view = IOrders.viewport.getActiveItem(),
+                tableStore = Ext.getStore('tables')
+            ;
+            tableStore.getById(t).set('loading', false);
+            
+            if(view.isSetView && view.tableRecord === t) {
+                view.setViewStore.currentPage = 1;
+                view.setViewStore.load();
+
+                var list = view.form.getComponent('list'),
+                    pullPlugin = list.pullPlugin
+                ;
+                pullPlugin.isLoading && pullPlugin.onLoadComplete.call(pullPlugin);
+
+                list.setLoading(false);
+                view.form.scroller.scrollTo({y: 0});
+            } else if(view.isObjectView) {
+                var depStore = view.depStore,
+                    depRec = depStore.findRecord('id', t, undefined, undefined, true, true),
+                    depTable = tableStore.getById(t),
+                    objectTable = tableStore.getById(view.objectRecord.modelName)
+                ;
+                
+                if(depRec) {
+                    depRec.set('loading', false);
+                    loadDepData(depRec, depTable, view, undefined, true);
+                }
+            }
+            
+            var tableRec = Ext.getStore('tables').getById(t);
+            loadDepData(tableRec, tableRec, undefined, undefined, true);
+            
 		});
 		
+        
+        IOrders.xi.on('beforeupload', this.onBeforeUpload, this);
 	},
+
+    onBeforeUpload: function(store) {
+        
+        var view = IOrders.viewport.getActiveItem();
+		
+		if(view.isXType('navigatorview')) {
+			
+			if(view.isObjectView) {
+                
+                if(store.findExact('id', view.objectRecord.get('xid')) !== -1)
+                    this.controlButtonsVisibilities(view, true);
+            }
+        }
+    },
 
 	onUploadRecord: function(record) {
 		
@@ -68,7 +137,30 @@ Ext.regController('Navigator', {
 		}
 	},
 
-	onUploadTable: function(table) {
+	beforeTableLoad: function(table) {
+		var view = IOrders.viewport.getActiveItem(),
+            tableRec = Ext.getStore('tables').getById(table)
+		;
+		
+        if(!tableRec.get('loading')) {
+            if(view.isObjectView && view.depList) {
+                
+                var depStore = view.depStore,
+                    depRec = depStore.findRecord('id', table, undefined, undefined, true, true)
+                ;
+                
+                if(depRec) {
+                    depRec.set ('loading', true);
+                }
+            }
+            
+            tableRec.set('loading', true);
+        } else {
+            return false;
+        }
+	},
+
+	onTableLoad: function(table, willContinue) {
 		
 		var view = IOrders.viewport.getActiveItem(),
 			tableStore = Ext.getStore('tables')
@@ -76,27 +168,36 @@ Ext.regController('Navigator', {
 		
 		if(view.isObjectView) {
 			
-			view.depStore.clearFilter(true);
-			
 			var depStore = view.depStore,
-				depRec = depStore.findRecord('table_id', table, undefined, undefined, true, true),
+				depRec = depStore.findRecord('id', table, undefined, undefined, true, true),
 				depTable = tableStore.getById(table),
 				objectTable = tableStore.getById(view.objectRecord.modelName)
 			;
 			
 			if(depRec) {
-				loadDepData(depRec, depTable, view);
+                depRec.set('loading', willContinue === true);
+				loadDepData(depRec, depTable, view, undefined, true);
 			}
 		}
-		
+        
+        var tableRec = Ext.getStore('tables').getById(table);
+        loadDepData(tableRec, tableRec, undefined, undefined, true);
 	},
 
 	onBackButtonTap: function(options) {
 		
-		var view = options.view;
-			newCard = Ext.create(view.ownerViewConfig)
+		var view = options.view,
+			rec = view.form.getRecord()
 		;
-		
+        
+        var ownerViewConfig = view.ownerViewConfig;
+        
+        while(!ownerViewConfig.isSetView && ownerViewConfig.ownerViewConfig) {
+            ownerViewConfig = ownerViewConfig.ownerViewConfig;
+        }
+        
+        var newCard = Ext.create(ownerViewConfig);
+        
 		if (newCard.isSetView) {
 			Ext.dispatch(Ext.apply(options, {action: 'loadSetViewStore', newCard: newCard, anim: IOrders.viewport.anims.back}));
 		} else {
@@ -120,19 +221,27 @@ Ext.regController('Navigator', {
 			record = view.objectRecord
 		;
 
-		view.setLoading(true);
-		Ext.ModelMgr.getModel(record.modelName).prototype.getProxy().destroy(new Ext.data.Operation({id: record.getId(), records: [record]}), function(operation) {
-
-			view.setLoading(false);
-			Ext.dispatch(Ext.apply(options, {action: 'goBack'}));
-		});
+        if(!this.checkRecordInUpload(record.get('xid'))) {
+            view.setLoading(true);
+            Ext.ModelMgr.getModel(record.modelName).prototype.getProxy().destroy(new Ext.data.Operation({id: record.getId(), records: [record]}), function(operation) {
+    
+                var tableRec = Ext.getStore('tables').getById(record.modelName);
+                loadDepData(tableRec, tableRec, undefined, undefined, true);
+                view.setLoading(false);
+                Ext.dispatch(Ext.apply(options, {action: 'goBack'}));
+            });
+            
+        } else {
+            Ext.Msg.alert('', 'Нельзя удалить. Запись отправляется на сервер');
+        }
 	},
 
 	onSaveButtonTap: function(options) {
 		
 		var view = options.view,
 		    form = view.form,
-		    rec = form.getRecord()
+		    rec = form.getRecord(),
+		    dirty = rec.dirty
 		;
 		
 		form.updateRecord(rec);
@@ -151,16 +260,42 @@ Ext.regController('Navigator', {
 				options.view.depStore.each(function(rec) {
 					rec.set('editing', false);
 				});
+                
+                if(options.view.isNew) {
+                    var statusBar = form.getComponent('statusToolbar'),
+                        state = undefined
+                    ;
+                        
+                    if(statusBar) {
+                        
+                        var segBtn = statusBar.getComponent('processing');
+                        
+                        segBtn.items.each(function(b) {
+                            if(b.pressed) {
+                                state = b.name;
+                                return false;
+                            }
+                            return true;
+                        });
+                        
+                    }
+                    
+                    rec.set('processing', state);
+                }
 				
 				var toolbar = btn.up('toolbar');
-				
-				toolbar.getComponent('Cancel').hide();
+                
 				Ext.dispatch(Ext.apply(options, {action: 'setEditing', editing: false}));
 
 				rec.fields.getByKey('processing') && this.controlButtonsVisibilities(view, rec.get('processing') != 'draft' && !rec.get('serverPhantom'));
 			}
 			
-			rec.save();
+            view.isNew = false;
+            
+			rec.save({callback: function() {
+                var tableRec = Ext.getStore('tables').getById(rec.modelName);
+                loadDepData(tableRec, tableRec, undefined, undefined, true);
+            }});
 			view.fireEvent ('saved', rec);
 			
 		} else {
@@ -178,26 +313,37 @@ Ext.regController('Navigator', {
 	
 	onEditButtonTap: function(options) {
 		
-		var btn = options.btn;
-		btn.setText('Сохранить');
-		Ext.apply(btn, {name: 'Save'});
-		
-		options.view.depStore.each(function(rec) {
-			rec.set('editing', true);
-		});
-		
-		var toolbar = btn.up('toolbar');
-		toolbar.getComponent('Cancel').show();
-		
-		Ext.dispatch(Ext.apply(options, {action: 'setEditing', editing: true}));
+        if(!this.checkRecordInUpload(options.view.objectRecord.get('xid'))) {
+            var btn = options.btn;
+            btn.setText('Сохранить');
+            Ext.apply(btn, {name: 'Save'});
+            
+            options.view.depStore.each(function(rec) {
+                rec.set('editing', true);
+            });
+            
+            var toolbar = btn.up('toolbar');
+            //toolbar.getComponent('Cancel').show();
+            
+            Ext.dispatch(Ext.apply(options, {action: 'setEditing', editing: true}));
+        } else {
+            Ext.Msg.alert('', 'Редактирование недоступно. Запись отправляется на сервер');
+        }
 	},
+    
+    checkRecordInUpload: function(xid) {
+        
+        var store = Ext.getStore('ToUpload');
+        
+        return store && store.findExact('id', xid) !== -1;
+    },
 	
 	onCancelButtonTap: function(options) {
 		
 		options.view.form.load(options.view.form.getRecord());
 		
 		var toolbar = options.btn.up('toolbar');
-		toolbar.getComponent('Cancel').hide();
+		//toolbar.getComponent('Cancel').hide();
 		
 		var saveEditBtn = toolbar.getComponent('SaveEdit');
 		
@@ -236,14 +382,19 @@ Ext.regController('Navigator', {
 		var rec = undefined;
 
 		if(options.view.isObjectView) {
-			rec = Ext.ModelMgr.create({serverPhantom: true}, options.view.objectRecord.modelName);
-			/**
-			 * TODO Пока создается пустая сущность.
-			 * Возможно нужно проставлять все поля-паренты как у сущности из которой создалась новая
-			 */
-			
+
+            var tableRec = Ext.getStore('tables').getById(options.view.objectRecord.modelName),
+                parentColumns = tableRec.getParentColumns()
+            ;
+
+            rec = Ext.ModelMgr.create({serverPhantom: true}, options.view.objectRecord.modelName);
+
+            parentColumns.each(function(col) {
+                rec.set(col.get('name'), options.view.objectRecord.get(col.get('name')));
+            });
+
 		} else if(options.view.isSetView) {
-			rec = Ext.ModelMgr.create({}, options.view.tableRecord);
+			rec = Ext.ModelMgr.create({serverPhantom: true}, options.view.tableRecord);
 			
 			rec.set (
 				options.view.objectRecord.modelName.toLowerCase(),
@@ -251,16 +402,16 @@ Ext.regController('Navigator', {
 			);
 		}
 		
-		if (rec.modelName === 'SaleOrder' || rec.modelName === 'EncashmentRequest')
-			rec.set('date', getNextWorkDay())
-		;
+		if (rec.modelName === 'SaleOrder' || rec.modelName === 'EncashmentRequest') {
+			rec.set('date', getNextWorkDay());
+		}
 		
 		var oldCard = IOrders.viewport.getActiveItem();
 		if(rec.modelName === 'Uncashment') {
 
 			Ext.dispatch(Ext.apply(options, {action: 'createUncashmentView'}));
 		} else {
-			IOrders.viewport.setActiveItem(Ext.create(createNavigatorView(rec, oldCard, false, true)));
+			IOrders.viewport.setActiveItem(Ext.create(Ext.apply(createNavigatorView(rec, oldCard, false, true), {isNew: true})));
 		}
 		
 		
@@ -289,7 +440,7 @@ Ext.regController('Navigator', {
 				
 				var createdRecordModelName = isTableList
 						? target.up('.dep').down('input').dom.value
-						: list.getRecord(item).get('table_id'),
+						: list.getRecord(item).get('id'),
 					objectRecord = isTableList
 						? (list.modelForDeps && !Ext.getStore('tables').getById(tappedRec.modelName).hasIdColumn()
 								? Ext.getStore(list.modelForDeps).getById(tappedRec.get(list.modelForDeps.toLowerCase())) 
@@ -430,7 +581,7 @@ Ext.regController('Navigator', {
 				isWhite: debt.get('isWhite'), datetime: new Date().format('Y-m-d H:i:s'),
 				customer: view.customerRecord.getId(), debt: debt.getId(),
 				summ: parseFloat(debt.get('encashSumm')).toFixed(2),
-				uncashment: undefined, serverPhantom: true
+				uncashment: undefined, serverPhantom: true,
 			}, 'Encashment'));
 		});
 		
@@ -627,13 +778,13 @@ Ext.regController('Navigator', {
 			objectRecord: objectRecord
 		});
 		
-		var newCard = Ext.create(createNavigatorView(
+		var newCard = Ext.create(Ext.apply(createNavigatorView(
 			objectRecord,
 			IOrders.viewport.getActiveItem(),
 			options.isSetView,
 			options.editing,
 			config
-		));
+		), {isNew: objectRecord.phantom}));
 		
 		if (newCard.isSetView) {
 			Ext.dispatch(Ext.apply(options, {action: 'loadSetViewStore', newCard: newCard}));
@@ -895,100 +1046,16 @@ Ext.regController('Navigator', {
 		Ext.each(options.selections, function(record) {
 			if(!record.data.deps) {
 				if(!depStore || !tableRecord) {
-					tableRecord = tableStore.getById(record.modelName);
-					hasIdColumn = tableRecord.hasIdColumn();
-					tableRecord = !hasIdColumn && list.modelForDeps ? tableStore.getById(list.modelForDeps) : tableRecord; 
-					depStore = tableRecord.deps();
+					var tableRecord = tableStore.getById(record.modelName),
+    					hasIdColumn = tableRecord.hasIdColumn(),
+    					tableRecord = !hasIdColumn && list.modelForDeps ? tableStore.getById(list.modelForDeps) : tableRecord,
+    					depStore = tableRecord.deps()
+                    ;
 				}
 				
-				var data = [];
-				
-				depStore.each(function(dep) {
-					
-					var depTable = tableStore.getById(dep.get('table_id'));
-					
-					if(depTable.get('nameSet') && (depTable.get('id') != 'SaleOrderPosition' || record.modelName == 'SaleOrder') && record.modelName !== depTable.get('id')) {
-						
-						var depRec = {
-								name: depTable.get('nameSet'),
-								table_id: depTable.get('id'),
-								extendable: depTable.get('extendable'),
-								contains: dep.get('contains'),
-								editing: false
-							},
-							modelProxy = Ext.ModelMgr.getModel(depTable.get('id')).prototype.getProxy(),
-							filters = []
-						;
-
-						recordForDeps = list.modelForDeps && !hasIdColumn 
-								? Ext.getStore(list.modelForDeps).getById(record.get(list.modelForDeps[0].toLowerCase() + list.modelForDeps.substring(1))) 
-								: record;
-
-						recordForDeps.modelName != 'MainMenu'
-							&& filters.push({
-								property: recordForDeps.modelName.toLowerCase(),
-								value: recordForDeps.getId()
-							})
-						;	
-
-						if(depTable.hasAggregates()) {
-						
-							var aggCols = depTable.getAggregates();
-							var aggOperation = new Ext.data.Operation({filters: filters});
-
-							modelProxy.aggregate(aggOperation, function(operation) {
-
-								var aggDepResult = '';
-								var aggDepTpl = new Ext.XTemplate('<tpl if="value &gt; 0"><tpl if="name">{name} : </tpl>{[values.value.toFixed(2)]} </tpl>');
-								var aggResults = operation.resultSet.records[0].data;
-
-								aggCols.each(function(aggCol) {
-									aggDepResult += aggDepTpl.apply({name: aggCol.get('label') != depTable.get('nameSet') ? aggCol.get('label') : '', value: aggResults[aggCol.get('name')]});
-								});
-
-								depRec.aggregates = aggDepResult;
-								depRec.count = aggResults.cnt;
-
-								record.data.deps = data;
-								list.store && list.refreshNode(list.indexOf(record));
-								
-								list.doComponentLayout();
-							});
-						} else {
-							var operCount = new Ext.data.Operation ({
-								filters: filters
-							});
-							
-							modelProxy.count(operCount, function(operation) {
-								depRec.count = operation.result;
-								record.data.deps = data;
-								list.store && list.refreshNode(list.indexOf(record));
-								
-								list.doComponentLayout();
-							});
-						}
-						
-						var t = depStore.getById(depRec.table_id);
-						
-						if(t && t.columns && t.columns().findBy(function(c){return c.get('name')=='processing'}) > 0) {
-							
-							filters.push({property: 'processing', value: 'draft'});
-							
-							var countOperation = new Ext.data.Operation({depRec: depRec, filters: filters});
-							modelProxy.aggregate(countOperation, function(operation) {
-								
-								var aggResults = operation.resultSet.records[0].data;
-								
-								if (aggResults.cnt > 0) operation.depRec.stats =  aggResults.cnt;
-								
-								record.data.deps = data;
-								list.store && list.refreshNode(list.indexOf(record));
-							});
-						}
-
-						data.push(depRec);
-					}
-				});
+				getDepsData(depStore, tableStore, undefined,
+                    {list: list, record: record, tableRecord: tableRecord, hasIdColumn: hasIdColumn}
+                );
 			}
 		});
 	},
@@ -1004,10 +1071,11 @@ Ext.regController('Navigator', {
 
 				var saleOrder = view.objectRecord;
 
-				if(field.name == 'isBonus' && options.oldValue != undefined) {
+				if(field.name == 'isBonus' && options.oldValue != undefined && view.form.recordLoaded) {
 
-					var customerStore = view.form.items.getAt(1).getComponent('customer').store,
-						customerRecord = customerStore.getById(saleOrder.get('customer')),
+					var customerField = view.form.getComponent('formFields').getComponent('customer'),
+						customerStore = customerField.store,
+						customerRecord = customerStore.getById(saleOrder.get('customer') || customerField.getValue()),
 						tc = saleOrder.get('totalCost'),
 						bc = customerRecord.get('bonusCost')
 					;

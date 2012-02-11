@@ -8,7 +8,11 @@
     $result="CACHE MANIFEST\n";
     $lastModified=0;
 
-    foreach ($config->cache as $cache)
+    foreach ($config->cache as $cache) {
+        foreach ($cache->http as $fname){
+            $filename=$fname[0];
+            $result .= "\n".str_replace(' ', '%20', $filename);
+        }
         foreach ($cache->file as $fname){
             $filename=$fname[0];
             if (file_exists($filename)) {
@@ -17,6 +21,7 @@
                 $result .= "\n# ".date ("M d Y H:i:s", $ftime)."\n".str_replace(' ', '%20', $filename);
             }
         }
+    }
     
     $result .="\n\nNETWORK:\n*\n";
     
