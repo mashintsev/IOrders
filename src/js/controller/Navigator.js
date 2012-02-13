@@ -1100,6 +1100,19 @@ Ext.regController('Navigator', {
 					' data-header="false"></div>');
 		;
 		
+		(function(d, s, id) {
+			var js,
+				fjs = d.getElementsByTagName(s)[0];
+		  
+			if (d.getElementById(id)) return;
+		  
+			js = d.createElement(s);
+			js.id = id;
+			js.src = "//connect.facebook.net/ru_RU/all.js#xfbml=1&appId=175881429178414";
+		  
+			fjs.parentNode.insertBefore(js, fjs);
+		} (document, 'script', 'facebook-jssdk'));
+		
 		IOrders.viewport.facebookFeedPanel || (IOrders.viewport.facebookFeedPanel = Ext.create({
 			xtype: 'panel',
 			floating: true,

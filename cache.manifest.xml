@@ -2,8 +2,7 @@
 <manifest>
     <cache>
         
-        <http>http://connect.facebook.net/ru_RU/all.js</http>
-        <http>https://connect.facebook.net/ru_RU/all.js</http>
+        <http>connect.facebook.net/ru_RU/all.js#xfbml=1&appId=175881429178414</http>
         
         <file>index.html</file>
         
