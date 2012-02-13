@@ -343,6 +343,6 @@
 	background-repeat: no-repeat;
 }
 
-.make-draft.x-button-pressed .x-button-label {
+.make-draft.x-button-pressed .x-button-label,  .x-panel.statusDesc .draft{
 	color: blue;
 }

@@ -111,7 +111,7 @@ Ext.regController('Navigator', {
 						;
 						
 						segBtn.getComponent(state).enable();
-						segBtn.setPressed(state, true, true);
+						segBtn.setPressed(state, true, false);
 						segBtn.items.each(function(b) {
 							b.disable();
 							b.canEnable && b[b.canEnable(state) ? 'enable' : 'disable']();
