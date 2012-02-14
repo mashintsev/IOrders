@@ -538,7 +538,8 @@ var createNavigatorView = function(rec, oldCard, isSetView, editing, config) {
 
 	var view = Ext.apply({
 			xtype: 'navigatorview',
-			layout: IOrders.newDesign ? {type: 'hbox', pack: 'justify', align: 'stretch'} : 'fit',
+			layout: IOrders.newDesign && rec.get('name') ? {type: 'hbox', pack: 'justify', align: 'stretch'} :
+				'fit',
 			isObjectView: isSetView ? undefined : true,
 			isSetView: isSetView ? true : undefined,
 			objectRecord: isSetView ? oldCard.objectRecord : rec,
