@@ -581,7 +581,7 @@ Ext.regController('Navigator', {
 				isWhite: debt.get('isWhite'), datetime: new Date().format('Y-m-d H:i:s'),
 				customer: view.customerRecord.getId(), debt: debt.getId(),
 				summ: parseFloat(debt.get('encashSumm')).toFixed(2),
-				uncashment: undefined, serverPhantom: true,
+				uncashment: undefined, serverPhantom: true
 			}, 'Encashment'));
 		});
 		
