@@ -465,7 +465,7 @@ var loadDepData = function(depRec, depTable, view, config, force) {
 		}
 	}
 
-	if(!depRec.get('count') || depRec.get('filtered') || depRec.get('expandable') || force) {
+	if(!depRec.get('count') || depRec.get('filtered') || depRec.get('expandable') || force || true) {
 
 		var aggCols = depTable.getAggregates();
 		var aggOperation = new Ext.data.Operation({depRec: depRec, filters: filters});
