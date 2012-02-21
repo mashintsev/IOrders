@@ -251,10 +251,25 @@
 }
 
 .crec {
-	color: white;
-	background-color: red;
+	color: white !important;
 	padding: 2px 6px;
 	margin-left: 6px;
+}
+
+.crec.silver {
+	background-color: silver;
+}
+.crec.gray {
+	background-color: gray;
+}
+.crec.black {
+	background-color: black;
+}
+.crec.blue {
+	background-color: blue;
+}
+.crec.red {
+	background-color: red;
 }
 
 .hbox.dep {

@@ -149,7 +149,7 @@ Ext.regController('SaleOrder', {
 								;
 
 								if(filters.contains && filters.contains(this.isFocusedFilter) || filters == this.isFocusedFilter) {
-									bonusProgramStore.filter({property: 'isFocused', value: true});
+									bonusProgramStore.filter({property: 'isFirstScreen', value: true});
 									bonusProductStore.filterBy(function(it) {
 										return bonusProgramStore.findExact('id', it.get('bonusprogram')) !== -1 ? true : false;
 									});
@@ -256,7 +256,7 @@ Ext.regController('SaleOrder', {
 																	var bonusProductStore = newCard.bonusProductStore,
 																		bonusProgramStore = newCard.bonusProgramStore
 																	;
-																	bonusProgramStore.filter({property: 'isFocused', value: true});
+																	bonusProgramStore.filter({property: 'isFirstScreen', value: true});
 																	bonusProductStore.filterBy(function(it) {
 																		return bonusProgramStore.findExact('id', it.get('bonusprogram')) !== -1 ? true : false;
 																	});
@@ -521,7 +521,7 @@ Ext.regController('SaleOrder', {
 
 	expandFocusedProduct: function(options) {
 		var view = options.view,
-			doms = view.productList.getEl().query('.x-list-item .focused')
+			doms = view.productList.getEl().query('.x-list-item .isNonHidable')
 		;
 
 		Ext.each(doms, function(dom) {
