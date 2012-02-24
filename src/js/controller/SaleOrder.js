@@ -184,7 +184,10 @@ Ext.regController('SaleOrder', {
 							}]
 						});
 
-						newCard.productList = newCard.productPanel.add(Ext.apply(offerProductList, {flex: 3, store: newCard.productStore}));
+						newCard.productList = newCard.productPanel.add(Ext.apply(offerProductList, {
+							flex: 3, store: newCard.productStore, pinHeaders: false
+						}));
+						
 						newCard.productListIndexBar = newCard.productPanel.add(new HorizontalIndexBar({hidden: !newCard.indexBarMode, list: newCard.productList}));
 
 						newCard.productStore.load({
