@@ -115,7 +115,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 						{text: 'Черновик', itemId: 'draft', name: 'draft', canEnable: function(s) { return s == 'upload'; },
 							desc: 'Заказ-черновик не отправится на склад пока вы не измените его статус на "В работу"'},
 						{text: 'В работу', itemId: 'upload', name: 'upload', canEnable: function(s) { return s == 'draft'; },
-							desc: 'При первой же синхронизации с сервером заказ отправится на склад'},
+							desc: 'При первой же синхронизации с сервером заказ отправится на склад (если в заказе есть товары)'},
 						{text: 'Проверка', itemId: 'processing', name: 'processing',
 							desc: 'Заказ обрабатывается на сервере. Изменить его через iOrders уже нельзя.'},
 						{text: 'На складе', itemId: 'done', name: 'done',
@@ -158,15 +158,17 @@ var NavigatorView = Ext.extend(AbstractView, {
 							name: cName, cls: 'statuses',
 							listeners: {
 								toggle: function (segBtn, btn, pressed) {
-									pressed && segBtn.up('panel').getComponent('statusDesc').update({desc: btn.desc});
+									pressed && segBtn.up('panel').getComponent('statusDesc').update(btn);
+								},
+								afterLayout: function (me) {
+									me.fireEvent ('toggle', me, me.getComponent(btnPressed.name), true);
 								}
 							}
 						}]},{
 							xtype: 'panel',
 							itemId: 'statusDesc',
 							cls: 'statusDesc',
-							tpl: '{desc}',
-							html: btnPressed.desc
+							tpl: '<div class="{name}">{desc}</div>'
 						}
 					);
 				}
@@ -313,7 +315,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 			var sortersConfig = getSortersConfig(this.tableRecord, listGroupedConfig);
 			
 			this.setViewStore = createStore(this.tableRecord, Ext.apply(listGroupedConfig, sortersConfig));
-
+			
 			formItems.push(Ext.apply({
 				xtype: 'list',
 				itemId: 'list',

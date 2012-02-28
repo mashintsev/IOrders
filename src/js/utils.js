@@ -264,12 +264,15 @@ function getItemTpl (modelName) {
 				+	'</div>';
 		}
 		case 'OfferProduct': {
-			return '<div class="hbox<tpl if="lastActive"> active</tpl><tpl if="BonusProgram_tag.search(\'Ф\') != -1"> focused</tpl>">'
+			return '<div class="hbox '
+						+'<tpl if="lastActive"> active</tpl>'
+						+'<tpl if="isNonHidable"> isNonHidable</tpl>'
+						+'<tpl if="BonusProgram_tag.search(\'Ф\') != -1"> focused</tpl>">'
 			       +'<div class="info {cls} data ' + '<tpl if="stockLevel==1">caution</tpl>' + '">'
 				     + '<p>{name}'
 						+'<tpl if="extraLabel"><span class="blue"> [{extraLabel}]</span></tpl>'
 						+'<tpl if="lastActive"><span class="green"> [{lastActive}]</span></tpl>'
-						+'<tpl if="BonusProgram_tag"><span class="crec">{BonusProgram_tag}</span></tpl>'
+						+'<tpl if="BonusProgram_tag"><span class="crec {BonusProgram_tagColor}">{BonusProgram_tag}</span></tpl>'
 					 +'</p>'
 				     + '<small><span class="price">Цена: {price} руб. </span>'
 					   + '<tpl if="rel &gt; 1"><span>Вложение: {rel}; </span></tpl>'
@@ -505,7 +508,7 @@ var loadDepData = function(depRec, depTable, view, config, force) {
 		}
 	}
 
-	if(!depRec.get('count') || depRec.get('filtered') || depRec.get('expandable') || force) {
+	if(!depRec.get('count') || depRec.get('filtered') || depRec.get('expandable') || force || true) {
 
 		var aggCols = depTable.getAggregates();
 		var aggOperation = new Ext.data.Operation({depRec: depRec, filters: filters});
@@ -578,7 +581,8 @@ var createNavigatorView = function(rec, oldCard, isSetView, editing, config) {
 
 	var view = Ext.apply({
 			xtype: 'navigatorview',
-			layout: IOrders.newDesign ? {type: 'hbox', pack: 'justify', align: 'stretch'} : 'fit',
+			layout: IOrders.newDesign && rec.get('name') ? {type: 'hbox', pack: 'justify', align: 'stretch'} :
+				'fit',
 			isObjectView: isSetView ? undefined : true,
 			isSetView: isSetView ? true : undefined,
 			objectRecord: isSetView ? oldCard.objectRecord : rec,

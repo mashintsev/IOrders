@@ -463,7 +463,11 @@ Ext.regController('Main', {
             }});
 		}
 
-		rec.fields.getByKey('processing') && this.controlButtonsVisibilities(view, !view.editing && rec.get('processing') != 'draft' && !rec.get('serverPhantom'));
+		rec.fields.getByKey('processing') &&
+			this.controlButtonsVisibilities(
+				view,
+				!view.editing && rec.get('processing') != 'draft' && !rec.get('serverPhantom')
+			);
 	},
 
 	controlButtonsVisibilities: function(view, hide) {

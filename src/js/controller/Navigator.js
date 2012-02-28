@@ -111,7 +111,7 @@ Ext.regController('Navigator', {
 						;
 						
 						segBtn.getComponent(state).enable();
-						segBtn.setPressed(state, true, true);
+						segBtn.setPressed(state, true, false);
 						segBtn.items.each(function(b) {
 							b.disable();
 							b.canEnable && b[b.canEnable(state) ? 'enable' : 'disable']();
@@ -581,7 +581,7 @@ Ext.regController('Navigator', {
 				isWhite: debt.get('isWhite'), datetime: new Date().format('Y-m-d H:i:s'),
 				customer: view.customerRecord.getId(), debt: debt.getId(),
 				summ: parseFloat(debt.get('encashSumm')).toFixed(2),
-				uncashment: undefined, serverPhantom: true,
+				uncashment: undefined, serverPhantom: true
 			}, 'Encashment'));
 		});
 		
@@ -1099,6 +1099,19 @@ Ext.regController('Navigator', {
 					' data-width="{width}" data-height="{height}" data-show-faces="false" data-stream="true"' +
 					' data-header="false"></div>');
 		;
+		
+		(function(d, s, id) {
+			var js,
+				fjs = d.getElementsByTagName(s)[0];
+		  
+			if (d.getElementById(id)) return;
+		  
+			js = d.createElement(s);
+			js.id = id;
+			js.src = "//connect.facebook.net/ru_RU/all.js#xfbml=1&appId=175881429178414";
+		  
+			fjs.parentNode.insertBefore(js, fjs);
+		} (document, 'script', 'facebook-jssdk'));
 		
 		IOrders.viewport.facebookFeedPanel || (IOrders.viewport.facebookFeedPanel = Ext.create({
 			xtype: 'panel',
