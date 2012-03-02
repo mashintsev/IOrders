@@ -56,24 +56,19 @@ var createModels = function(tablesStore) {
 function afterCreateModels() {
 
 	Ext.override(Ext.ModelMgr.getModel('Customer'), {
-		loadFocusedBonusProgram: function(callback) {
+		getCustomerBonusProgram: function(callback) {
 			
-			var aggOperation = new Ext.data.Operation({filters: [{property: 'customer', value: this.getId()}]});
-			modelProxy.aggregate(countOperation, function(operation) {
-				
-				var aggResults = operation.resultSet.records[0].data;
-				operation.depRec.set('stats', aggResults.cnt);
-				
-				if(isSetView) {
-					
-					config.record.data.deps = config.data;
-					config.list.store && config.list.refreshNode(config.list.indexOf(config.record));
-					
-					config.list.doComponentLayout();
-				}
+			var store = createStore('CustomerBonusProgram', {
+				filters: [{property: 'customer', value: this.getId()}]
 			});
 			
-			callback && callback.call(this);
+			store.load({
+				limit: 0,
+				callback: function() {
+					callback && callback.call(this, store);
+				},
+				scope: this
+			});
 		}
 	});
 };

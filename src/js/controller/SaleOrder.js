@@ -274,9 +274,11 @@ Ext.regController('SaleOrder', {
 																IOrders.viewport.setActiveItem(newCard);
 																newCard.productListIndexBar.loadIndex();
 																
-																newCard.customerRecord.loadFocusedBonusProgram(function(bonusStore) {
+																newCard.on('activate', function() {
+																	newCard.customerRecord.getCustomerBonusProgram(function(bonusStore) {
 																	
-																	Ext.dispatch(Ext.apply(options, {action: 'toggleBonusOn', view: newCard, bonusStore: bonusStore}));
+																		Ext.dispatch(Ext.apply(options, {action: 'toggleBonusOn', view: newCard, bonusStore: bonusStore}));
+																	});
 																});
 
 																Ext.dispatch(Ext.apply(options, {action: 'expandFocusedProduct', view: newCard}));
@@ -722,7 +724,10 @@ Ext.regController('SaleOrder', {
 		
 		if(bonusStore) {
 			
-			view.bonusProgramStore.filterBy(function(item) {return bonusStore.findExact('bonusprogram', item.getId()) !== -1;});
+			view.bonusProgramStore.filterBy(function(item) {
+				return bonusStore.findExact('id', item.getId()) !== -1
+					|| (item.get('isPopAtStart') && !item.get('isCustomerTargeted'));
+			});
 			
 			var bonusList = view.bonusPanel.getComponent('bonusList');
 			bonusList.selectSnapshot && bonusList.selModel.select(bonusList.selectSnapshot);
