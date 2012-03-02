@@ -50,6 +50,32 @@ var createModels = function(tablesStore) {
 		regStore(tableName);
 	});
 
+	afterCreateModels();
+};
+
+function afterCreateModels() {
+
+	Ext.override(Ext.ModelMgr.getModel('Customer'), {
+		loadFocusedBonusProgram: function(callback) {
+			
+			var aggOperation = new Ext.data.Operation({filters: [{property: 'customer', value: this.getId()}]});
+			modelProxy.aggregate(countOperation, function(operation) {
+				
+				var aggResults = operation.resultSet.records[0].data;
+				operation.depRec.set('stats', aggResults.cnt);
+				
+				if(isSetView) {
+					
+					config.record.data.deps = config.data;
+					config.list.store && config.list.refreshNode(config.list.indexOf(config.record));
+					
+					config.list.doComponentLayout();
+				}
+			});
+			
+			callback && callback.call(this);
+		}
+	});
 };
 
 function continueLoad (store,r,s){
