@@ -268,18 +268,18 @@ Ext.regController('SaleOrder', {
 
 																	bonusProductStore.clearFilter(true);
 																	bonusProgramStore.clearFilter(true);
+																	
+																	newCard.on('activate', function() {
+																		newCard.customerRecord.getCustomerBonusProgram(function(bonusStore) {
+																		
+																			Ext.dispatch(Ext.apply(options, {action: 'toggleBonusOn', view: newCard, bonusStore: bonusStore}));
+																		});
+																	});
 																}
 
 																oldCard.setLoading(false);
 																IOrders.viewport.setActiveItem(newCard);
 																newCard.productListIndexBar.loadIndex();
-																
-																newCard.on('activate', function() {
-																	newCard.customerRecord.getCustomerBonusProgram(function(bonusStore) {
-																	
-																		Ext.dispatch(Ext.apply(options, {action: 'toggleBonusOn', view: newCard, bonusStore: bonusStore}));
-																	});
-																});
 
 																Ext.dispatch(Ext.apply(options, {action: 'expandFocusedProduct', view: newCard}));
 															}
@@ -725,7 +725,7 @@ Ext.regController('SaleOrder', {
 		if(bonusStore) {
 			
 			view.bonusProgramStore.filterBy(function(item) {
-				return bonusStore.findExact('id', item.getId()) !== -1
+				return bonusStore.findExact('bonusProgram', item.getId()) !== -1
 					|| (item.get('isPopAtStart') && !item.get('isCustomerTargeted'));
 			});
 			
