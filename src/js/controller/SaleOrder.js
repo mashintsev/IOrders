@@ -731,6 +731,10 @@ Ext.regController('SaleOrder', {
 			
 			var bonusList = view.bonusPanel.getComponent('bonusList');
 			bonusList.selectSnapshot && bonusList.selModel.select(bonusList.selectSnapshot);
+			
+			if(view.bonusProgramStore.getCount() < 1) {
+				view.bonusPanel.hide();
+			}
 		}
 		
 		list.scroller.scrollTo({y: 0});
