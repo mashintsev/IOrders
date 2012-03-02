@@ -222,14 +222,19 @@ Ext.regController('Navigator', {
 		;
 
         if(!this.checkRecordInUpload(record.get('xid'))) {
-            view.setLoading(true);
-            Ext.ModelMgr.getModel(record.modelName).prototype.getProxy().destroy(new Ext.data.Operation({id: record.getId(), records: [record]}), function(operation) {
-    
-                var tableRec = Ext.getStore('tables').getById(record.modelName);
-                loadDepData(tableRec, tableRec, undefined, undefined, true);
-                view.setLoading(false);
-                Ext.dispatch(Ext.apply(options, {action: 'goBack'}));
-            });
+            Ext.Msg.confirm('Удаление записи', 'Вы действительно хотите удалить запись?',
+                function(btn) {
+                    if(btn == 'yes') {
+                        view.setLoading(true);
+                            Ext.ModelMgr.getModel(record.modelName).prototype.getProxy().destroy(new Ext.data.Operation({id: record.getId(), records: [record]}), function(operation) {
+                                
+                                var tableRec = Ext.getStore('tables').getById(record.modelName);
+                                loadDepData(tableRec, tableRec, undefined, undefined, true);
+                                view.setLoading(false);
+                                Ext.dispatch(Ext.apply(options, {action: 'goBack'}));
+                            });
+                    }
+                }, this);
             
         } else {
             Ext.Msg.alert('', 'Нельзя удалить. Запись отправляется на сервер');
@@ -374,7 +379,7 @@ Ext.regController('Navigator', {
 		options.view.editing = options.editing;
 
 		var toolbar = options.btn.up('toolbar');
-		toolbar.getComponent('Add')[options.editing ? 'hide' : 'show']();
+		toolbar.getComponent('Add')[options.editing ? 'disable' : 'enable']();
 	},
 	
 	onAddButtonTap: function(options) {

@@ -216,7 +216,7 @@ var NavigatorView = Ext.extend(AbstractView, {
 			}
 			
 			table.get('extendable') && !table.get('belongs') && this.dockedItems[0].items.push({
-				itemId: 'Add', ui: 'plain', iconMask: true, name: 'Add', iconCls: 'add', scope: this, hidden: this.editing
+				itemId: 'Add', ui: 'plain', iconMask: true, name: 'Add', iconCls: 'add', scope: this, disabled: this.editing
 			});
 			
 			if (this.objectRecord.modelName === 'MainMenu') {
