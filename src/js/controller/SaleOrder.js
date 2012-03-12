@@ -271,7 +271,6 @@ Ext.regController('SaleOrder', {
 																	
 																	newCard.on('activate', function() {
 																		newCard.customerRecord.getCustomerBonusProgram(function(bonusStore) {
-																		
 																			Ext.dispatch(Ext.apply(options, {action: 'toggleBonusOn', view: newCard, bonusStore: bonusStore}));
 																		});
 																	});
@@ -725,7 +724,7 @@ Ext.regController('SaleOrder', {
 		if(bonusStore) {
 			
 			view.bonusProgramStore.filterBy(function(item) {
-				return bonusStore.findExact('bonusProgram', item.getId()) !== -1
+				return bonusStore.findExact('bonusProgram', item.getId()) !== -1 && item.get('isPopAtStart')
 					|| (item.get('isPopAtStart') && !item.get('isCustomerTargeted'));
 			});
 			
