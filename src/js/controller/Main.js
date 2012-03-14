@@ -351,12 +351,28 @@ Ext.regController('Main', {
 					location.reload();
 				});
 				
-				IOrders.dbeng.startDatabase (
-					Ext.decode(localStorage.getItem('metadata')),
-					true
-				);
+				IOrders.xi.request( Ext.applyIf ({
+					command: 'metadata',
+					success: function(response) {
+						var m = response.responseXML;
+						
+						console.log(m);
+						
+						var metadata = this.xml2obj(m).metadata;
+						
+						if ( metadata.version > IOrders.dbeng.db.version ) {
+							localStorage.setItem('metadata', Ext.encode(metadata));
+						}
+						
+						IOrders.dbeng.startDatabase (
+							Ext.decode(localStorage.getItem('metadata')),
+							true
+						);
+					}},
+					this.prefsCb
+				));
 			}
-		});
+		}, this);
 	},
 
 	onReloadButtonTap: function(options) {
