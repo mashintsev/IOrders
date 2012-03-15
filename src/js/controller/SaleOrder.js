@@ -271,7 +271,8 @@ Ext.regController('SaleOrder', {
 																	
 																	newCard.on('activate', function() {
 																		newCard.customerRecord.getCustomerBonusProgram(function(bonusStore) {
-																			Ext.dispatch(Ext.apply(options, {action: 'toggleBonusOn', view: newCard, bonusStore: bonusStore}));
+																			newCard.customerRecord.bonusProgramStore = bonusStore;
+																			Ext.dispatch(Ext.apply(options, {action: 'toggleBonusOn', view: newCard, atStart: true, bonusStore: bonusStore}));
 																		});
 																	});
 																}
@@ -663,7 +664,7 @@ Ext.regController('SaleOrder', {
 
 		var view = options.view,
 			productRec = options.productRec,
-			bonusStore = options.bonusStore
+			customerBonusProgramStore = options.bonusStore || view.customerRecord.bonusProgramStore
 		;
 
 		if(!view.bonusPanel) { 
@@ -711,6 +712,10 @@ Ext.regController('SaleOrder', {
 		list.refresh();
 		view.bonusPanel.show();
 
+		view.bonusProgramStore.filterBy(function(item) {
+			return customerBonusProgramStore.findExact('bonusProgram', item.getId()) !== -1 || !item.get('isCustomerTargeted');
+		});
+		
 		if(productRec) {
 
 			view.bonusProductStore.filter({property: 'product', value: productRec.get('product')});
@@ -721,19 +726,18 @@ Ext.regController('SaleOrder', {
 			bonusList.selectSnapshot && bonusList.selModel.select(bonusList.selectSnapshot);
 		}
 		
-		if(bonusStore) {
+		if(options.atStart) {
 			
 			view.bonusProgramStore.filterBy(function(item) {
-				return bonusStore.findExact('bonusProgram', item.getId()) !== -1 && item.get('isPopAtStart')
-					|| (item.get('isPopAtStart') && !item.get('isCustomerTargeted'));
+				return item.get('isPopAtStart');
 			});
 			
 			var bonusList = view.bonusPanel.getComponent('bonusList');
 			bonusList.selectSnapshot && bonusList.selModel.select(bonusList.selectSnapshot);
-			
-			if(view.bonusProgramStore.getCount() < 1) {
-				view.bonusPanel.hide();
-			}
+		}
+		
+		if(view.bonusProgramStore.getCount() < 1) {
+			view.bonusPanel.hide();
 		}
 		
 		list.scroller.scrollTo({y: 0});
